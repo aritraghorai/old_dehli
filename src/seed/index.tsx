@@ -13,6 +13,17 @@ import { faker } from '@faker-js/faker';
 
 await myDataSource.initialize();
 
+//clear all data
+myDataSource.getRepository(Image).delete({});
+myDataSource.getRepository(Category).delete({});
+myDataSource.getRepository(Product).delete({});
+myDataSource.getRepository(ProductTag).delete({});
+myDataSource.getRepository(Option).delete({});
+myDataSource.getRepository(OptionValue).delete({});
+myDataSource.getRepository(ProductCofiguration).delete({});
+myDataSource.getRepository(ProductItem).delete({});
+//add data
+
 const images: Array<Image> = [];
 const catagories: Array<Category> = [];
 const products: Array<Product> = [];
