@@ -52,14 +52,14 @@ const start = async () => {
       ProductCofiguration,
       ProductTag,
       Option,
-      OptionValue
+      OptionValue,
     ],
   });
 
   const adminRouter = AdminJSExpress.buildRouter(admin);
   app.use(admin.options.rootPath, adminRouter);
 
-  app.listen(env.PORT, () => {
+  app.listen(+env.PORT, '0.0.0.0', () => {
     console.log(
       `AdminJS started on http://localhost:${env.PORT}${admin.options.rootPath}`,
     );
