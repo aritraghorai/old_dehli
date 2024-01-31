@@ -1,12 +1,12 @@
-import logger from "pino";
-import dayjs from "dayjs";
+import { pino } from 'pino';
+import dayjs from 'dayjs';
 
-const Log = logger({
+const Log = pino({
   base: {
     pid: false,
   },
   transport: {
-    target: "pino-pretty",
+    target: 'pino-pretty',
     options: {
       colorize: true,
     },
@@ -15,4 +15,3 @@ const Log = logger({
 });
 
 export default Log;
-

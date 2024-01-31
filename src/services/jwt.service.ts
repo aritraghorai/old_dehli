@@ -1,4 +1,4 @@
-import env from '@/utils/env'
+import env from '@/utils/env.js'
 import jwt from 'jsonwebtoken'
 
 export type JwtPayload = {

@@ -1,10 +1,11 @@
-import bcryptService from "@/services/bcrypt.service";
-import jwtService from "@/services/jwt.service";
-import otpService from "@/services/otp.service";
-import catchAsync from "@/utils/catchAsync";
-import prisma from "@/utils/prisma";
-import { LoginValidatorType, RegisterSendOtpValidatorType, VerifyOtpValidatorType } from "@/validator/auth.validator";
-import { User } from "@prisma/client";
+import { Otp } from "@/entities/otp.entity.js";
+import { User } from "@/entities/user.entiry.js";
+import bcryptService from "@/services/bcrypt.service.js";
+import jwtService from "@/services/jwt.service.js";
+import otpService from "@/services/otp.service.js";
+import { myDataSource } from "@/utils/app-data-source.js";
+import catchAsync from "@/utils/catchAsync.js";
+import { LoginValidatorType, RegisterSendOtpValidatorType, VerifyOtpValidatorType } from "@/validator/auth.validator.js";
 import { NextFunction, Request, Response } from "express";
 
 const gernerateTokenAndSendResponse = (user: User, res: Response) => {
@@ -22,9 +23,12 @@ const gernerateTokenAndSendResponse = (user: User, res: Response) => {
 
 const registerAndSendOtp = catchAsync(async (req: Request<{}, {}, RegisterSendOtpValidatorType>, res: Response, next: NextFunction) => {
   const { name, phoneNumber, password } = req.body
-  await prisma.$transaction(async (tx) => {
+
+  myDataSource.transaction(async (tx) => {
+    const userRepo = tx.getRepository(User)
+    const otpRepo = tx.getRepository(Otp)
     //Check if user exist
-    const userExist = await tx.user.findFirst({
+    const userExist = await userRepo.findOne({
       where: {
         phoneNumber
       }
@@ -35,27 +39,23 @@ const registerAndSendOtp = catchAsync(async (req: Request<{}, {}, RegisterSendOt
         message: 'User already exist',
       })
     }
-
     //create a new user
-    const user = await tx.user.create({
-      data: {
-        name,
-        phoneNumber,
-        password: await bcryptService.encryptPassword(password)
-      }
+    const user = userRepo.create({
+      name,
+      phoneNumber,
+      password: await bcryptService.encryptPassword(password)
     })
+    await userRepo.save(user)
     //generate otp
     const otp = otpService.generateOtp()
     //send otp
     await otpService.sendOtp(otp, phoneNumber)
     //create a new otp
-    await tx.otp.create({
-      data: {
-        otp: await bcryptService.encryptPassword(otp),
-        userId: user.id
-      }
+    const otpEntity = otpRepo.create({
+      otp: await bcryptService.encryptPassword(otp),
+      user: user
     })
-
+    await otpRepo.save(otpEntity)
     res.status(200).json({
       status: true,
       message: 'Register success',
@@ -65,27 +65,32 @@ const registerAndSendOtp = catchAsync(async (req: Request<{}, {}, RegisterSendOt
 
 const verifyOtp = catchAsync(async (req: Request<{}, {}, VerifyOtpValidatorType>, res: Response, next: NextFunction) => {
   const { phoneNumber, otp } = req.body
-  await prisma.$transaction(async (tx) => {
+
+  await myDataSource.transaction(async (tx) => {
+    const userRepo = tx.getRepository(User)
+    const otpRepo = tx.getRepository(Otp)
     //Check if user exist
-    const userExist = await tx.user.findFirst({
+    const userExist = await userRepo.findOne({
       where: {
         phoneNumber
-      }
+      },
     })
     if (!userExist) {
       return res.status(400).json({
         status: false,
-        message: 'User already exist'
+        message: 'User not exist',
       })
     }
-
+    console.log(userExist)
     //Check if otp exist
-    const otpExist = await tx.otp.findFirst({
+    const otpExist = await otpRepo.findOne({
       where: {
-        userId: userExist.id
+        user: {
+          id: userExist.id
+        }
       },
-      orderBy: {
-        createdAt: 'desc'
+      order: {
+        createdAt: 'DESC'
       }
     })
     if (!otpExist) {
@@ -94,7 +99,6 @@ const verifyOtp = catchAsync(async (req: Request<{}, {}, VerifyOtpValidatorType>
         message: 'Otp not found',
       })
     }
-
     //Check if otp match
     const otpMatch = await bcryptService.comparePassword(otp, otpExist.otp)
     if (!otpMatch) {
@@ -103,32 +107,37 @@ const verifyOtp = catchAsync(async (req: Request<{}, {}, VerifyOtpValidatorType>
         message: 'Otp not match',
       })
     }
-
     //update user status
-    await tx.user.update({
-      where: {
+    await userRepo.update({
+      id: userExist.id
+    }, {
+      isVerified: true
+    })
+    //delete otp
+    await otpRepo.delete({
+      user: {
         id: userExist.id
-      },
-      data: {
-        isVerified: true
       }
     })
 
     return gernerateTokenAndSendResponse(userExist, res)
+
   })
 })
 
 export const login = catchAsync(async (req: Request<{}, {}, LoginValidatorType>, res: Response, next: NextFunction) => {
   const { phoneNumber, password } = req.body
-  const user = await prisma.user.findFirst({
+  const userRepo = myDataSource.getRepository(User)
+  const user = await userRepo.findOne({
     where: {
-      phoneNumber
+      phoneNumber,
+      isVerified: true
     }
   })
   if (!user) {
-    return res.status(404).json({
+    return res.status(400).json({
       status: false,
-      message: 'User not found',
+      message: 'User not exist',
     })
   }
   const passwordMatch = await bcryptService.comparePassword(password, user.password as string)

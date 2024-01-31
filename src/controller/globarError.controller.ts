@@ -1,6 +1,6 @@
-import AppError from "@/utils/AppError";
-import env from "@/utils/env";
-import Log from "@/utils/log";
+import AppError from "@/utils/AppError.js";
+import env from "@/utils/env.js";
+import Log from "@/utils/log.js";
 import { Request, Response, NextFunction } from "express";
 import multer from "multer";
 
