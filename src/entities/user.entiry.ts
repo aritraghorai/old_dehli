@@ -12,8 +12,8 @@ import {
   JoinColumn,
   PrimaryGeneratedColumn,
   ManyToOne,
-  AfterInsert,
   OneToMany,
+  Unique,
 } from 'typeorm';
 import { Role } from './role.entity.js';
 import { ProductItem } from './product.entity.js';
@@ -51,7 +51,7 @@ export class User extends BaseEntity {
 }
 
 @Entity()
-export class UserCart {
+export class UserCart extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -67,11 +67,12 @@ export class UserCart {
 
   @OneToMany(() => CartItem, p => p.cart, { eager: true, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'product_id' })
-  product: CartItem[];
+  cardItems: CartItem[];
 }
 
 @Entity()
-export class CartItem {
+@Unique(['cart', 'productItem'])
+export class CartItem extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -84,7 +85,7 @@ export class CartItem {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'product_id' })
-  product: ProductItem;
+  productItem: ProductItem;
 
   @Column({ type: 'int' })
   count: number;
