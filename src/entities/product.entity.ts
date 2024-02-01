@@ -84,26 +84,6 @@ export class OptionValue extends BaseEntity {
 }
 
 @Entity()
-export class ProductCofiguration extends BaseEntity {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
-
-  @ManyToOne(() => Option, option => option.id, {
-    eager: false,
-    onDelete: 'CASCADE',
-  })
-  @JoinColumn({ name: 'optionId' })
-  option: Option;
-
-  @ManyToOne(() => OptionValue, optionValue => optionValue.id, {
-    eager: false,
-    onDelete: 'CASCADE',
-  })
-  @JoinColumn({ name: 'optionValueId' })
-  optionValue: OptionValue;
-}
-
-@Entity()
 export class Product extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -149,7 +129,6 @@ export class Product extends BaseEntity {
 }
 
 @Entity()
-@Unique(['product', 'productConfig'])
 export class ProductItem extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -170,12 +149,12 @@ export class ProductItem extends BaseEntity {
   @Column({ type: 'float' })
   price: number;
 
-  @ManyToOne(() => ProductCofiguration, pc => pc.id, {
+  @OneToMany(() => ProductCofiguration, pc => pc.productItem, {
     eager: true,
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'productConfigId' })
-  productConfig?: ProductCofiguration;
+  productConfig?: ProductCofiguration[];
 
   @ManyToMany(() => Image, { eager: true, onDelete: 'CASCADE' })
   @JoinTable({ name: 'productItem_image' })
@@ -186,4 +165,32 @@ export class ProductItem extends BaseEntity {
 
   @UpdateDateColumn()
   updatedAt: Date;
+}
+
+@Entity()
+@Unique(['productItem', 'optionValue', 'option'])
+export class ProductCofiguration extends BaseEntity {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @ManyToOne(() => ProductItem, productItem => productItem.id, {
+    eager: false,
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'productItemId' })
+  productItem: ProductItem;
+
+  @ManyToOne(() => OptionValue, optionValue => optionValue.id, {
+    eager: true,
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'optionValueId' })
+  optionValue: OptionValue;
+
+  @ManyToOne(() => Option, option => option.id, {
+    eager: true,
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'optionId' })
+  option: Option;
 }
