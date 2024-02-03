@@ -7,7 +7,9 @@
     "typeorm": "typeorm-ts-node-esm",
     "migration:generate": "typeorm-ts-node-esm -d src/utils/app-data-source.ts migration:generate",
     "migration:run": "typeorm-ts-node-esm -d src/utils/app-data-source.ts migration:run",
-    "rollup": "rollup -c"
+    "rollup": "rollup -c",
+    "dev:prod":"pm2 start ecosystem.config.cjs --env production --only app",
+    "dev:prod:stop":"pm2 delete NodeServer"
   },
   "type": "module",
   "devDependencies": {
