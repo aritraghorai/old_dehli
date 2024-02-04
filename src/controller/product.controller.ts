@@ -10,7 +10,7 @@ const getAllProduct = catchAsync(
     res: Response,
     next: NextFunction,
   ) => {
-    const { limit, page, category, search } = req.query;
+    const { limit, page, category, search, shop } = req.query;
     const [products, total] = await Product.findAndCount({
       skip: (page - 1) * limit,
       take: limit,
@@ -22,9 +22,13 @@ const getAllProduct = catchAsync(
         category: {
           slug: category ? Like(`%${category}%`) : Like(`%%`),
         },
+        shop:{
+          slug: shop ? Like(`%${shop}%`) : Like(`%%`),
+        }
       },
       relations: {
         category: true,
+        shop: true,
       },
     });
     res.status(200).json({

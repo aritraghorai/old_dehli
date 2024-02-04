@@ -8,8 +8,8 @@
     "migration:generate": "typeorm-ts-node-esm -d src/utils/app-data-source.ts migration:generate",
     "migration:run": "typeorm-ts-node-esm -d src/utils/app-data-source.ts migration:run",
     "rollup": "rollup -c",
-    "dev:prod":"pm2 start ecosystem.config.cjs --env production --only app",
-    "dev:prod:stop":"pm2 delete NodeServer"
+    "dev:prod": "pm2 start ecosystem.config.cjs --env production --only app",
+    "dev:prod:stop": "pm2 delete NodeServer"
   },
   "type": "module",
   "devDependencies": {
@@ -57,8 +57,10 @@
     "pg": "^8.11.3",
     "pino": "^8.17.2",
     "pino-pretty": "^10.3.1",
+    "pm2": "^5.3.1",
     "pnpm": "^8.9.0",
     "postgres": "^3.4.3",
+    "prom-client": "^15.1.0",
     "socket.io": "^4.7.2",
     "ts-node": "^10.9.1",
     "tsc-alias": "^1.8.8",

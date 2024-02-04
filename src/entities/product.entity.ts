@@ -3,13 +3,11 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  Index,
   JoinColumn,
   JoinTable,
   ManyToMany,
   ManyToOne,
   OneToMany,
-  OneToOne,
   PrimaryGeneratedColumn,
   Unique,
   UpdateDateColumn,
@@ -82,6 +80,32 @@ export class OptionValue extends BaseEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 }
+@Entity()
+@Unique(['name'])
+export class Shop extends BaseEntity {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column({ type: 'varchar' })
+  name: string;
+
+  @Column({ unique: true, type: 'varchar' })
+  slug: string;
+
+  @Column({ nullable: true, type: 'text' })
+  description: string;
+
+  @ManyToMany(() => Image, { eager: true, onDelete: 'CASCADE' })
+  @JoinTable({ name: 'restruent_image' })
+  images:Image[]
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+}
+
 
 @Entity()
 export class Product extends BaseEntity {
@@ -104,6 +128,10 @@ export class Product extends BaseEntity {
 
   @Column({ nullable: true, type: 'text' })
   description: string;
+
+  @ManyToOne(() => Shop, s => s.id, { eager: true, onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'shopId' })
+  shop:Shop
 
   @Column({ type: 'float' })
   price: number;

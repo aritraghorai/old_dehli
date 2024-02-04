@@ -5,6 +5,7 @@ export const productQuerySchema = z.object({
   limit: z.coerce.number().int().positive().optional().default(10),
   category: z.string().optional(),
   search: z.string().optional(),
+  shop: z.string().optional(),
 });
 
 export type ProductQuery = z.infer<typeof productQuerySchema>;

@@ -7,6 +7,7 @@ import {
   ProductCofiguration,
   ProductItem,
   ProductTag,
+  Shop,
 } from '@/entities/product.entity.js';
 import { myDataSource } from '@/utils/app-data-source.js';
 import { faker } from '@faker-js/faker';
@@ -14,14 +15,15 @@ import { faker } from '@faker-js/faker';
 await myDataSource.initialize();
 
 //clear all data
-myDataSource.getRepository(Image).delete({});
-myDataSource.getRepository(Category).delete({});
-myDataSource.getRepository(Product).delete({});
-myDataSource.getRepository(ProductTag).delete({});
-myDataSource.getRepository(Option).delete({});
-myDataSource.getRepository(OptionValue).delete({});
-myDataSource.getRepository(ProductCofiguration).delete({});
-myDataSource.getRepository(ProductItem).delete({});
+await myDataSource.getRepository(Image).delete({});
+await myDataSource.getRepository(Category).delete({});
+await myDataSource.getRepository(Product).delete({});
+await myDataSource.getRepository(ProductTag).delete({});
+await myDataSource.getRepository(Option).delete({});
+await myDataSource.getRepository(OptionValue).delete({});
+await myDataSource.getRepository(ProductCofiguration).delete({});
+await myDataSource.getRepository(ProductItem).delete({});
+await myDataSource.getRepository(Shop).delete({});
 //add data
 
 const images: Array<Image> = [];
@@ -30,6 +32,7 @@ const products: Array<Product> = [];
 const productTags: Array<ProductTag> = [];
 const productOptions: Map<string, Array<OptionValue>> = new Map();
 const productConfigurations: ProductCofiguration[] = [];
+const shops: Array<Shop> = [];
 
 await myDataSource.transaction(async manager => {
   //add images
@@ -91,6 +94,17 @@ await myDataSource.transaction(async manager => {
     newProductTag.description = faker.commerce.productDescription();
     productTags.push(await newProductTag.save());
   }
+  //add shops
+  const shopRepository = manager.getRepository(Shop);
+  for (let i = 1; i <= 100; i++) {
+    const newShop = shopRepository.create();
+    newShop.name = faker.company.name();
+    newShop.slug = faker.helpers.slugify(newShop.name);
+    newShop.description = faker.commerce.productDescription();
+    newShop.images = [];
+    newShop.images.push(faker.helpers.arrayElement(images));
+    shops.push(await newShop.save());
+  }
   //add products
   const productRepository = manager.getRepository(Product);
   for (let i = 1; i <= 100; i++) {
@@ -101,6 +115,7 @@ await myDataSource.transaction(async manager => {
       price: Math.floor(Math.random() * 1000000),
       description: faker.commerce.productDescription(),
       category: faker.helpers.arrayElement(catagories),
+      shop: faker.helpers.arrayElement(shops),
       productTag: [
         faker.helpers.arrayElement(productTags),
         faker.helpers.arrayElement(productTags),
@@ -143,7 +158,7 @@ await myDataSource.transaction(async manager => {
       productConfiguration.option = option;
       productConfiguration.optionValue = faker.helpers.arrayElement(
         productOptions.get(option.id),
-      )
+      );
       await productConfiguration.save();
     } else {
       const productItem = productItemRepository.create();
