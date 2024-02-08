@@ -1,14 +1,17 @@
 import {
+  BaseEntity,
   Column,
+  CreateDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { User } from './user.entiry.js';
 
 @Entity()
-export class Address {
+export class Address extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -38,10 +41,16 @@ export class Address {
 
   @Column({ type: 'varchar' })
   state: string;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }
 
 @Entity()
-export class UserAddress {
+export class UserAddress extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -55,4 +64,10 @@ export class UserAddress {
   @ManyToOne(() => User, u => u.id, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
   user: User;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }

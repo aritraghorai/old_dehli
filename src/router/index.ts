@@ -5,6 +5,7 @@ import uploadRouter from './upload.router.js';
 import productRouter from './product.routes.js';
 import cardRouter from './cart.router.js';
 import shopRouter from './shop.validator.js';
+import userAddressRouter from './userAddress.router.js';
 
 const router = Router();
 
@@ -14,5 +15,6 @@ router.use('/upload', uploadRouter);
 router.use('/product', productRouter);
 router.use('/user-card', cardRouter);
 router.use('/shop', shopRouter);
+router.use('/user-address', userAddressRouter);
 
 export default router;
