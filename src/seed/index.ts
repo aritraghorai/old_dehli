@@ -145,21 +145,21 @@ await myDataSource.transaction(async manager => {
   const productItemRepository = manager.getRepository(ProductItem);
   for (let i = 0; i < products.length; i++) {
     if (i % 2 === 0) {
-      let productItem = productItemRepository.create();
-      productItem.product = products[i];
-      productItem.stock = Math.floor(Math.random() * 100);
-      productItem.price = Math.floor(Math.random() * 1000000);
-      productItem.sku = faker.random.alphaNumeric(10);
-      productItem.images = [];
-      productItem.images.push(faker.helpers.arrayElement(images));
-      await productItem.save();
-      const productConfiguration = productConfigurationRepository.create();
-      productConfiguration.productItem = productItem;
-      productConfiguration.option = option;
-      productConfiguration.optionValue = faker.helpers.arrayElement(
-        productOptions.get(option.id),
-      );
-      await productConfiguration.save();
+      for (let i = 0; i < 3; i++) {
+        let productItem = productItemRepository.create();
+        productItem.product = products[i];
+        productItem.stock = Math.floor(Math.random() * 100);
+        productItem.price = Math.floor(Math.random() * 1000000);
+        productItem.sku = faker.random.alphaNumeric(10);
+        productItem.images = [];
+        productItem.images.push(faker.helpers.arrayElement(images));
+        await productItem.save();
+        const productConfiguration = productConfigurationRepository.create();
+        productConfiguration.productItem = productItem;
+        productConfiguration.option = option;
+        productConfiguration.optionValue = productOptions.get(option.id)[i];
+        await productConfiguration.save()
+      }
     } else {
       const productItem = productItemRepository.create();
       productItem.product = products[i];

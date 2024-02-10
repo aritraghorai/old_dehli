@@ -74,7 +74,7 @@ export class Order extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', nullable: true })
   orderNumber: string;
 
   @Column({ type: 'float', default: 0 })
@@ -108,6 +108,9 @@ export class Order extends BaseEntity {
 
   @Column({ type: 'varchar', nullable: true })
   paymentId: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  orderId: string;
 
   @Column({ type: 'varchar', enum: PAYMENT_GATEWAY })
   paymentGateway: string;

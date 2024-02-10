@@ -1,7 +1,6 @@
 import { DataSource } from 'typeorm';
 import env from './env.js';
 
-console.log(process.env);
 
 export const myDataSource = new DataSource({
   type: 'postgres',

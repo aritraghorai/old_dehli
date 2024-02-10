@@ -9,4 +9,6 @@ export default {
   JWT_EXPIRED: process.env.JWT_EXPIRES_IN,
   DATABASE_URL: process.env.DATABASE_URL,
   BACKEND_URL: process.env.BACKEND_URL,
+  RAZORPAY_KEY_ID: process.env.RAZORPAY_KEY_ID,
+  RAZOR_PAY_KEY_SECRET: process.env.RAZOR_PAY_KEY_SECRET,
 };

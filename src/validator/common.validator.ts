@@ -7,3 +7,5 @@ export const queryPageValidator = z.object({
   page: z.coerce.number().optional().default(1),
   limit: z.coerce.number().int().positive().optional().default(10),
 })
+
+export type QueryPageType = z.infer<typeof queryPageValidator>;

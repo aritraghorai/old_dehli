@@ -22,13 +22,14 @@ const getAllProduct = catchAsync(
         category: {
           slug: category ? Like(`%${category}%`) : Like(`%%`),
         },
-        shop:{
+        shop: {
           slug: shop ? Like(`%${shop}%`) : Like(`%%`),
         }
       },
       relations: {
         category: true,
         shop: true,
+        productItems: true
       },
     });
     res.status(200).json({
