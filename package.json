@@ -34,9 +34,10 @@
   "dependencies": {
     "@adminjs/express": "^6.1.0",
     "@adminjs/typeorm": "^5.0.0",
+    "@adminjs/upload": "^4.0.2",
     "@paralleldrive/cuid2": "^2.2.2",
     "@prisma/client": "5.8.1",
-    "@types/cors": "^2.8.14",
+    "@types/cors": "^2.8.17",
     "@types/passport": "^1.0.13",
     "@types/passport-jwt": "^3.0.10",
     "add": "^2.0.6",

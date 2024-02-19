@@ -12,5 +12,6 @@ shopRouter.get(
   }),
   shopController.getAllShops,
 );
+shopRouter.get('/all', shopController.getAllShopsAll);
 
 export default shopRouter;

@@ -1,3 +1,4 @@
+import { type } from 'os';
 import { z } from 'zod';
 
 export const productQuerySchema = z.object({
@@ -7,5 +8,40 @@ export const productQuerySchema = z.object({
   search: z.string().optional(),
   shop: z.string().optional(),
 });
+export const NewProductBodyValidator = z.object({
+  name: z.string().min(3).max(255),
+  description: z.string().min(3).max(255),
+  productTags: z.array(z.string().uuid()).optional(),
+  categoryId: z.string().uuid(),
+  shopId: z.string().uuid(),
+  price: z.number().positive(),
+});
+
+export const ProductAndProductTagParamValidator = z.object({
+  productId: z.string().uuid(),
+  productTagId: z.string().uuid(),
+});
+
+export const ProductItemValidator = z.object({
+  sku: z.string().min(3).max(20),
+  stock: z.coerce
+    .number()
+    .positive()
+    .transform(val => +val),
+  price: z.coerce
+    .number()
+    .positive()
+    .transform(val => +val),
+  images: z.array(z.string().uuid()).optional(),
+  optionValues: z.array(z.string().uuid()).optional(),
+});
+
+export type NewProductItem = z.infer<typeof ProductItemValidator>;
+
+export type ProductAndProductTagParam = z.infer<
+  typeof ProductAndProductTagParamValidator
+>;
+
+export type NewProductBody = z.infer<typeof NewProductBodyValidator>;
 
 export type ProductQuery = z.infer<typeof productQuerySchema>;

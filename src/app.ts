@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import express from 'express';
 import router from './router/index.js';
 import morgan from 'morgan';
+import cors from 'cors';
 import AdminJS from 'adminjs';
 import AdminJSExpress from '@adminjs/express';
 import globalErrorHandler from './controller/globarError.controller.js';
@@ -20,10 +21,14 @@ import {
 import { Category } from './entities/category.entity.js';
 import { Image } from './entities/image.entity.js';
 import { Role } from './entities/role.entity.js';
+import { Order, OrderAddress, OrderItem } from './entities/order.entity.js';
+import bcryptService from './services/bcrypt.service.js';
 
 const app = express();
 
 app.use(morgan('dev'));
+
+app.use(cors());
 
 await myDataSource.initialize();
 
@@ -40,6 +45,23 @@ AdminJS.registerAdapter({
   Database: AdminJSTypeorm.Database,
 });
 
+const DEFAULT_ADMIN = {
+  email: 'admin@example.com',
+  password: 'password',
+};
+
+const authenticate = async (email: string, password: string) => {
+  const user = await User.findOne({
+    where: {
+      phoneNumber: email,
+    },
+  });
+  if (user && (await bcryptService.comparePassword(password, user.password))) {
+    return user;
+  }
+  return null;
+};
+
 const start = async () => {
   const admin = new AdminJS({
     resources: [
@@ -53,10 +75,31 @@ const start = async () => {
       ProductTag,
       Option,
       OptionValue,
+      Order,
+      OrderItem,
+      OrderAddress,
     ],
   });
 
-  const adminRouter = AdminJSExpress.buildRouter(admin);
+  const adminRouter = AdminJSExpress.buildAuthenticatedRouter(
+    admin,
+    {
+      authenticate,
+      cookieName: 'adminjs',
+      cookiePassword: 'sessionsecret',
+    },
+    null,
+    {
+      resave: true,
+      saveUninitialized: true,
+      secret: 'sessionsecret',
+      cookie: {
+        httpOnly: process.env.NODE_ENV === 'production',
+        secure: process.env.NODE_ENV === 'production',
+      },
+      name: 'adminjs',
+    },
+  );
   app.use(admin.options.rootPath, adminRouter);
 
   app.listen(+env.PORT, '0.0.0.0', () => {

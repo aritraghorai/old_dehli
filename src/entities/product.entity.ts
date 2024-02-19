@@ -14,6 +14,7 @@ import {
 } from 'typeorm';
 import { Image } from './image.entity.js';
 import { Category } from './category.entity.js';
+import { boolean } from 'zod';
 
 @Entity()
 export class ProductTag extends BaseEntity {
@@ -95,9 +96,12 @@ export class Shop extends BaseEntity {
   @Column({ nullable: true, type: 'text' })
   description: string;
 
+  @Column({ type: 'boolean', default: true })
+  isActive: boolean;
+
   @ManyToMany(() => Image, { eager: true, onDelete: 'CASCADE' })
   @JoinTable({ name: 'restruent_image' })
-  images:Image[]
+  images: Image[];
 
   @CreateDateColumn()
   createdAt: Date;
@@ -105,7 +109,6 @@ export class Shop extends BaseEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 }
-
 
 @Entity()
 export class Product extends BaseEntity {
@@ -131,7 +134,7 @@ export class Product extends BaseEntity {
 
   @ManyToOne(() => Shop, s => s.id, { eager: true, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'shopId' })
-  shop:Shop
+  shop: Shop;
 
   @Column({ type: 'float' })
   price: number;
@@ -144,6 +147,9 @@ export class Product extends BaseEntity {
     onDelete: 'CASCADE',
   })
   productItems: ProductItem[];
+
+  @Column({ type: 'boolean', default: true })
+  isActive: boolean;
 
   @ManyToOne(() => Category, c => c.id, { eager: false, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'categoryId' })
@@ -181,8 +187,10 @@ export class ProductItem extends BaseEntity {
     eager: true,
     onDelete: 'CASCADE',
   })
-  @JoinColumn({ name: 'productConfigId' })
   productConfig?: ProductCofiguration[];
+
+  @Column({ type: 'boolean', default: true })
+  isActive: boolean;
 
   @ManyToMany(() => Image, { eager: true, onDelete: 'CASCADE' })
   @JoinTable({ name: 'productItem_image' })

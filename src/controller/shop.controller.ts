@@ -24,6 +24,15 @@ const getAllShops = catchAsync(
     });
   },
 );
+const getAllShopsAll = catchAsync(async (req: Request, res: Response) => {
+  const data = await Shop.find();
+  res.status(200).json({
+    status: true,
+    data,
+  });
+});
+
 export default {
   getAllShops,
+  getAllShopsAll,
 };
