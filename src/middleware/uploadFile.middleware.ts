@@ -1,6 +1,7 @@
 import AppError from '@/utils/AppError.js';
 import multer from 'multer';
 import path from 'path';
+import fs from 'fs';
 
 export interface multerFile {
   fieldname: string;
@@ -14,14 +15,19 @@ export interface multerFile {
 }
 export type multerFiledType = { [fieldname: string]: multerFile[] };
 
-
 const fileSize = 1024 * 1024 * 1; // 5MB
 
 const storage = multer.diskStorage({
-  destination: function(_req, _file, cb) {
-    cb(null, 'public/uploads/image/');
+  destination: function (_req, _file, cb) {
+    const path = 'public/uploads/image/';
+    if (!fs.existsSync(path)) {
+      fs.mkdirSync(path, {
+        recursive: true,
+      });
+    }
+    cb(null, path);
   },
-  filename: function(_req, file, cb) {
+  filename: function (_req, file, cb) {
     const ext = path.extname(file.originalname);
     const baseName = path.basename(file.originalname) + '-' + Date.now();
     cb(null, baseName + ext);
@@ -29,7 +35,7 @@ const storage = multer.diskStorage({
 });
 export const uploadImage = multer({
   storage: storage,
-  fileFilter: function(_req, file, cb) {
+  fileFilter: function (_req, file, cb) {
     const ext = path.extname(file.originalname);
     if (ext !== '.png' && ext !== '.jpg' && ext !== '.gif' && ext !== '.jpeg') {
       return cb(
