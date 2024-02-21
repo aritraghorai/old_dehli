@@ -12,25 +12,29 @@ const createCatagory = catchAsync(
     res: Response,
     next: NextFunction,
   ) => {
-    const { name, parentCategoryId, slug } = req.body;
+    const { name, parentCategoryId, slug, description } = req.body;
 
     //check if slug already exists
     const slugExists = await categoryRepository.findOne({
       where: { slug },
-    })
+    });
 
     if (slugExists) return next(new AppError('Slug already exists', 400));
 
-    const parentCategory = await categoryRepository.findOne({
-      where: { id: parentCategoryId },
-    })
     const NewCatagory = categoryRepository.create({
       name,
       slug,
-    })
-    if (parentCategory) NewCatagory.parent = parentCategory
+      description,
+    });
 
-    categoryRepository.save(NewCatagory)
+    if (parentCategoryId) {
+      const findParentCategory =
+        await categoryRepository.findOneById(parentCategoryId);
+      if (!findParentCategory) {
+        NewCatagory.parent = findParentCategory;
+      }
+    }
+    categoryRepository.save(NewCatagory);
 
     return res.status(201).json({
       status: true,
@@ -41,7 +45,23 @@ const createCatagory = catchAsync(
 
 const getAllCatagory = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const catagory = await myDataSource.manager.getTreeRepository(Category).findTrees();
+    const catagory = await myDataSource.manager
+      .getTreeRepository(Category)
+      .findTrees();
+    return res.status(200).json({
+      status: true,
+      data: catagory,
+    });
+  },
+);
+const getAllCatagoryAll = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const catagory = await categoryRepository.find({
+      relations: {
+        subCategories: true,
+        parent: true,
+      },
+    });
     return res.status(200).json({
       status: true,
       data: catagory,
@@ -52,4 +72,5 @@ const getAllCatagory = catchAsync(
 export default {
   createCatagory,
   getAllCatagory,
+  getAllCatagoryAll,
 };

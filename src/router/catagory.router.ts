@@ -1,12 +1,21 @@
-import catagoryController from "@/controller/catagory.controller.js";
-import ValidateRequest from "@/middleware/ValidateRequest.js";
-import { NewCategoryValidator } from "@/validator/category.validator.js";
-import { Router } from "express";
+import catagoryController from '@/controller/catagory.controller.js';
+import extractUser from '@/controller/extractUser.js';
+import ValidateRequest from '@/middleware/ValidateRequest.js';
+import { NewCategoryValidator } from '@/validator/category.validator.js';
+import { Router } from 'express';
 
-const catagoryRouter = Router()
+const catagoryRouter = Router();
 
-catagoryRouter.post('/', ValidateRequest(NewCategoryValidator), catagoryController.createCatagory)
-catagoryRouter.get('/', catagoryController.getAllCatagory)
+catagoryRouter.get('/', catagoryController.getAllCatagory);
 
+catagoryRouter.use(extractUser);
 
-export default catagoryRouter
+catagoryRouter.post(
+  '/',
+  ValidateRequest(NewCategoryValidator),
+  catagoryController.createCatagory,
+);
+
+catagoryRouter.get('/all', catagoryController.getAllCatagoryAll);
+
+export default catagoryRouter;

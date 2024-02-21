@@ -7,4 +7,13 @@ export const shopQuerySchema = z.intersection(
     search: z.string().optional(),
   }),
 );
+
+export const NewShopValidator = z.object({
+  name: z.string().min(3).max(255),
+  description: z.string().min(3).max(255),
+  images: z.array(z.string().uuid()).optional(),
+})
+
+export type NewShopValidatorType = z.infer<typeof NewShopValidator>;
+
 export type ShopQuery = z.infer<typeof shopQuerySchema>;

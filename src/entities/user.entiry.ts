@@ -15,8 +15,29 @@ import {
   OneToMany,
   Unique,
 } from 'typeorm';
-import { Role } from './role.entity.js';
 import { ProductItem } from './product.entity.js';
+
+@Entity()
+export class Role extends BaseEntity {
+  @PrimaryColumn({ type: 'uuid' })
+  @Generated('uuid')
+  id: String;
+
+  @Column({ name: 'name', unique: true, type: 'varchar' })
+  name: String;
+
+  @Column({ nullable: true, type: 'text' })
+  description?: String;
+
+  @Column({ default: true, type: 'boolean' })
+  isVerified: Boolean;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+}
 
 @Entity()
 export class User extends BaseEntity {

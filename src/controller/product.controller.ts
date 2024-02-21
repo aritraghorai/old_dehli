@@ -80,8 +80,14 @@ const getProductById = catchAsync(
 
 const createProduct = catchAsync(
   async (req: Request<any, any, NewProductBody>, res: Response) => {
-    const { name, price, productTags, shopId, categoryId, description } =
-      req.body;
+    const {
+      name,
+      price,
+      productTags = [],
+      shopId,
+      categoryId,
+      description,
+    } = req.body;
     const slug = name.toLowerCase().split(' ').join('-');
     await myDataSource.transaction(async tx => {
       const product = Product.create({

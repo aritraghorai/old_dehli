@@ -26,6 +26,14 @@ productRouter.get(
 );
 productRouter.use(extractUser);
 
+
+productRouter.get(
+  '/all',
+  ValidateRequest(undefined, productQuerySchema),
+  productController.getAllProduct,
+);
+
+
 productRouter.post(
   '/',
   ValidateRequestNew({

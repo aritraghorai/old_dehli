@@ -9,7 +9,7 @@ import globalErrorHandler from './controller/globarError.controller.js';
 import { myDataSource } from './utils/app-data-source.js';
 import * as AdminJSTypeorm from '@adminjs/typeorm';
 import env from './utils/env.js';
-import { User } from './entities/user.entiry.js';
+import { Role, User } from './entities/user.entiry.js';
 import {
   Option,
   OptionValue,
@@ -20,7 +20,6 @@ import {
 } from './entities/product.entity.js';
 import { Category } from './entities/category.entity.js';
 import { Image } from './entities/image.entity.js';
-import { Role } from './entities/role.entity.js';
 import { Order, OrderAddress, OrderItem } from './entities/order.entity.js';
 import bcryptService from './services/bcrypt.service.js';
 
@@ -44,11 +43,6 @@ AdminJS.registerAdapter({
   Resource: AdminJSTypeorm.Resource,
   Database: AdminJSTypeorm.Database,
 });
-
-const DEFAULT_ADMIN = {
-  email: 'admin@example.com',
-  password: 'password',
-};
 
 const authenticate = async (email: string, password: string) => {
   const user = await User.findOne({

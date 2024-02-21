@@ -1,8 +1,26 @@
 import { Shop } from '@/entities/product.entity.js';
 import catchAsync from '@/utils/catchAsync.js';
-import { ShopQuery } from '@/validator/shop.validator.js';
+import { NewShopValidatorType, ShopQuery } from '@/validator/shop.validator.js';
+import { faker } from '@faker-js/faker';
 import { Request, Response } from 'express';
 import { Like } from 'typeorm';
+
+const createNewShop = catchAsync(
+  async (req: Request<any, any, NewShopValidatorType>, res: Response) => {
+    const { name, description, images } = req.body;
+    const shop = Shop.create({
+      name: name,
+      description: description,
+      slug: faker.helpers.slugify(name),
+      images: images.map(image => ({ id: image })),
+    });
+    await shop.save();
+    res.status(201).json({
+      status: true,
+      data: shop,
+    });
+  },
+);
 
 const getAllShops = catchAsync(
   async (req: Request<any, any, any, ShopQuery>, res: Response) => {
@@ -35,4 +53,5 @@ const getAllShopsAll = catchAsync(async (req: Request, res: Response) => {
 export default {
   getAllShops,
   getAllShopsAll,
+  createNewShop,
 };
