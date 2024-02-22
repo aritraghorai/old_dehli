@@ -47,7 +47,7 @@ export class Option extends BaseEntity {
 
   @OneToMany(() => OptionValue, ov => ov.option, {
     eager: false,
-    onDelete: 'CASCADE',
+    onDelete: 'NO ACTION',
   })
   @JoinColumn({ name: 'optionId' })
   Options: OptionValue[];
@@ -99,7 +99,7 @@ export class Shop extends BaseEntity {
   @Column({ type: 'boolean', default: true })
   isActive: boolean;
 
-  @ManyToMany(() => Image, { eager: true, onDelete: 'CASCADE' })
+  @ManyToMany(() => Image, { eager: true, onDelete: 'NO ACTION' })
   @JoinTable({ name: 'restruent_image' })
   images: Image[];
 
@@ -132,14 +132,14 @@ export class Product extends BaseEntity {
   @Column({ nullable: true, type: 'text' })
   description: string;
 
-  @ManyToOne(() => Shop, s => s.id, { eager: true, onDelete: 'CASCADE' })
+  @ManyToOne(() => Shop, s => s.id, { eager: true, onDelete: 'NO ACTION' })
   @JoinColumn({ name: 'shopId' })
   shop: Shop;
 
   @Column({ type: 'float' })
   price: number;
 
-  @ManyToMany(() => ProductTag, { eager: true, onDelete: 'CASCADE' })
+  @ManyToMany(() => ProductTag, { eager: true, onDelete: 'NO ACTION' })
   @JoinTable({ name: 'product_productTag' })
   productTag: ProductTag[];
 
@@ -151,7 +151,7 @@ export class Product extends BaseEntity {
   @Column({ type: 'boolean', default: true })
   isActive: boolean;
 
-  @ManyToOne(() => Category, c => c.id, { eager: false, onDelete: 'CASCADE' })
+  @ManyToOne(() => Category, c => c.id, { eager: false, onDelete: 'NO ACTION' })
   @JoinColumn({ name: 'categoryId' })
   category: Category;
 
@@ -185,14 +185,14 @@ export class ProductItem extends BaseEntity {
 
   @OneToMany(() => ProductCofiguration, pc => pc.productItem, {
     eager: true,
-    onDelete: 'CASCADE',
+    onDelete: 'NO ACTION',
   })
   productConfig?: ProductCofiguration[];
 
   @Column({ type: 'boolean', default: true })
   isActive: boolean;
 
-  @ManyToMany(() => Image, { eager: true, onDelete: 'CASCADE' })
+  @ManyToMany(() => Image, { eager: true, onDelete: 'NO ACTION' })
   @JoinTable({ name: 'productItem_image' })
   images: Image[];
 
@@ -211,21 +211,21 @@ export class ProductCofiguration extends BaseEntity {
 
   @ManyToOne(() => ProductItem, productItem => productItem.id, {
     eager: false,
-    onDelete: 'CASCADE',
+    onDelete: 'NO ACTION',
   })
   @JoinColumn({ name: 'productItemId' })
   productItem: ProductItem;
 
   @ManyToOne(() => OptionValue, optionValue => optionValue.id, {
     eager: true,
-    onDelete: 'CASCADE',
+    onDelete: 'NO ACTION',
   })
   @JoinColumn({ name: 'optionValueId' })
   optionValue: OptionValue;
 
   @ManyToOne(() => Option, option => option.id, {
     eager: true,
-    onDelete: 'CASCADE',
+    onDelete: 'NO ACTION',
   })
   @JoinColumn({ name: 'optionId' })
   option: Option;

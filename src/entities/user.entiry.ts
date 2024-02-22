@@ -66,7 +66,7 @@ export class User extends BaseEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @ManyToMany(() => Role, { eager: true, onDelete: 'CASCADE' })
+  @ManyToMany(() => Role, { eager: true, onDelete: 'NO ACTION' })
   @JoinTable()
   role: Role[];
 }
@@ -76,7 +76,7 @@ export class UserCart extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @OneToOne(() => User, { onDelete: 'CASCADE' })
+  @OneToOne(() => User, { onDelete: 'NO ACTION' })
   @JoinColumn({ name: 'user_id' })
   user: User;
 
@@ -86,7 +86,7 @@ export class UserCart extends BaseEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToMany(() => CartItem, p => p.cart, { eager: true, onDelete: 'CASCADE' })
+  @OneToMany(() => CartItem, p => p.cart, { eager: true, onDelete: 'NO ACTION' })
   @JoinColumn({ name: 'product_id' })
   cardItems: CartItem[];
 }
@@ -103,7 +103,7 @@ export class CartItem extends BaseEntity {
 
   @ManyToOne(() => ProductItem, product => product.id, {
     eager: true,
-    onDelete: 'CASCADE',
+    onDelete: 'NO ACTION',
   })
   @JoinColumn({ name: 'product_id' })
   productItem: ProductItem;

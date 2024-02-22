@@ -57,11 +57,11 @@ export class UserAddress extends BaseEntity {
   @Column({ type: 'boolean', default: false })
   isDefault: boolean;
 
-  @ManyToOne(() => Address, a => a.id, { onDelete: 'CASCADE', eager: true })
+  @ManyToOne(() => Address, a => a.id, { eager: true })
   @JoinColumn({ name: 'address_id' })
   address: Address;
 
-  @ManyToOne(() => User, u => u.id, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, u => u.id)
   @JoinColumn({ name: 'user_id' })
   user: User;
 

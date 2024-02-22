@@ -89,7 +89,7 @@ export class Order extends BaseEntity {
   })
   orderItems: OrderItem[];
 
-  @ManyToOne(() => User, u => u.id, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, u => u.id, { onDelete: 'NO ACTION' })
   @JoinColumn({ name: 'user_id' })
   user: User;
 
@@ -130,11 +130,11 @@ export class OrderItem extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => Order, o => o.id, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Order, o => o.id, { onDelete: 'NO ACTION' })
   @JoinColumn({ name: 'order_id' })
   order: Order;
 
-  @ManyToOne(() => ProductItem, p => p.id, { onDelete: 'CASCADE' })
+  @ManyToOne(() => ProductItem, p => p.id, { onDelete: 'NO ACTION' })
   @JoinColumn({ name: 'product_item_id' })
   productItem: ProductItem;
 
