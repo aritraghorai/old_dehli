@@ -3,6 +3,8 @@ import productController from '@/controller/product.controller.js';
 import productTagController from '@/controller/productTag.controller.js';
 import ValidateRequest from '@/middleware/ValidateRequest.js';
 import ValidateRequestNew from '@/middleware/ValidateRequestNew.js';
+import restrictUser from '@/middleware/restrictUser.middleware.js';
+import { ROLES } from '@/utils/Constant.js';
 import { praramIdValidator } from '@/validator/common.validator.js';
 import {
   NewProductBodyValidator,
@@ -25,14 +27,13 @@ productRouter.get(
   productController.getProductById,
 );
 productRouter.use(extractUser);
-
+productRouter.use(restrictUser(ROLES.ADMIN, ROLES.SUPER_ADMIN));
 
 productRouter.get(
   '/all',
   ValidateRequest(undefined, productQuerySchema),
-  productController.getAllProduct,
+  productController.getAllProductAdmin,
 );
-
 
 productRouter.post(
   '/',

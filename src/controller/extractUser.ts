@@ -22,7 +22,10 @@ const extractUser = catchAsync(
     const user = await userRepository.findOne({
       where: {
         id: decoded.userId,
-      }
+      },
+      relations: {
+        role: true,
+      },
     });
     if (!user) {
       return next(new AppError('User not found', 401));

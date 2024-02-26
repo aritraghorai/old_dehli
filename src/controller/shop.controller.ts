@@ -1,6 +1,10 @@
 import { Shop } from '@/entities/product.entity.js';
 import catchAsync from '@/utils/catchAsync.js';
-import { NewShopValidatorType, ShopQuery } from '@/validator/shop.validator.js';
+import {
+  NewShopValidatorType,
+  ShopQuery,
+  UpdateShopValidatorType,
+} from '@/validator/shop.validator.js';
 import { faker } from '@faker-js/faker';
 import { Request, Response } from 'express';
 import { Like } from 'typeorm';
@@ -50,8 +54,30 @@ const getAllShopsAll = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const updateShop = catchAsync(
+  async (
+    req: Request<{ id: string }, any, UpdateShopValidatorType>,
+    res: Response,
+  ) => {
+    const { id } = req.params;
+    const shop = await Shop.findOneOrFail({
+      where: {
+        id,
+      },
+    });
+    const { isActive } = req.body;
+    shop.isActive = isActive;
+    await shop.save();
+    res.status(200).json({
+      status: true,
+      data: shop,
+    });
+  },
+);
+
 export default {
   getAllShops,
   getAllShopsAll,
   createNewShop,
+  updateShop,
 };

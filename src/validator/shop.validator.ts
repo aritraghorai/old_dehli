@@ -12,7 +12,13 @@ export const NewShopValidator = z.object({
   name: z.string().min(3).max(255),
   description: z.string().min(3).max(255),
   images: z.array(z.string().uuid()).optional(),
-})
+});
+
+export const updateShopValidator = z.object({
+  isActive: z.boolean().optional(),
+});
+
+export type UpdateShopValidatorType = z.infer<typeof updateShopValidator>;
 
 export type NewShopValidatorType = z.infer<typeof NewShopValidator>;
 

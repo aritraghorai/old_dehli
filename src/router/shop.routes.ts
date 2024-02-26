@@ -1,9 +1,11 @@
 import extractUser from '@/controller/extractUser.js';
 import shopController from '@/controller/shop.controller.js';
 import ValidateRequestNew from '@/middleware/ValidateRequestNew.js';
+import { praramIdValidator } from '@/validator/common.validator.js';
 import {
   NewShopValidator,
   shopQuerySchema,
+  updateShopValidator,
 } from '@/validator/shop.validator.js';
 import { Router } from 'express';
 
@@ -26,6 +28,15 @@ shopRouter.post(
     reqBodySchema: NewShopValidator,
   }),
   shopController.createNewShop,
+);
+
+shopRouter.put(
+  '/:id',
+  ValidateRequestNew({
+    paramSchema: praramIdValidator,
+    reqBodySchema: updateShopValidator,
+  }),
+  shopController.updateShop,
 );
 
 export default shopRouter;

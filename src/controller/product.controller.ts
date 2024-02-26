@@ -33,6 +33,44 @@ const getAllProduct = catchAsync(
         shop: {
           slug: shop ? Like(`%${shop}%`) : Like(`%%`),
         },
+        productItems: MoreThan(0),
+      },
+      relations: {
+        category: true,
+        shop: true,
+        productItems: true,
+      },
+    });
+    res.status(200).json({
+      status: true,
+      data: products,
+      total,
+      page,
+      limit,
+      totalPage: Math.ceil(total / limit),
+    });
+  },
+);
+
+const getAllProductAdmin = catchAsync(
+  async (
+    req: Request<{}, {}, {}, ProductQuery>,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    const { limit, page, category, search, shop } = req.query;
+    const [products, total] = await Product.findAndCount({
+      skip: (page - 1) * limit,
+      take: limit,
+      where: {
+        name: search ? Like(`%${search}%`) : Like(`%%`),
+        description: search ? Like(`%${search}%`) : Like(`%%`),
+        category: {
+          slug: category ? Like(`%${category}%`) : Like(`%%`),
+        },
+        shop: {
+          slug: shop ? Like(`%${shop}%`) : Like(`%%`),
+        },
       },
       relations: {
         category: true,
@@ -179,4 +217,5 @@ export default {
   getProductById,
   createProduct,
   addNewProductItem,
+  getAllProductAdmin,
 };
