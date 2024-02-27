@@ -22,18 +22,18 @@ productRouter.get(
   productController.getAllProduct,
 );
 productRouter.get(
+  '/all',
+  ValidateRequest(undefined, productQuerySchema),
+  productController.getAllProductAdmin,
+);
+
+productRouter.get(
   '/:id',
   ValidateRequest(undefined, undefined, praramIdValidator),
   productController.getProductById,
 );
 productRouter.use(extractUser);
 productRouter.use(restrictUser(ROLES.ADMIN, ROLES.SUPER_ADMIN));
-
-productRouter.get(
-  '/all',
-  ValidateRequest(undefined, productQuerySchema),
-  productController.getAllProductAdmin,
-);
 
 productRouter.post(
   '/',
