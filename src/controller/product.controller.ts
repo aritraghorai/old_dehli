@@ -10,6 +10,7 @@ import {
   NewProductBody,
   NewProductItem,
   ProductQuery,
+  UpdateProductRequestBody,
 } from '@/validator/product.validator.js';
 import { NextFunction, Request, Response } from 'express';
 import { Like, MoreThan } from 'typeorm';
@@ -211,6 +212,43 @@ const addNewProductItem = catchAsync(
     });
   },
 );
+const updateProduct = catchAsync(
+  async (
+    req: Request<{ id: string }, any, UpdateProductRequestBody>,
+    res: Response,
+  ) => {
+    const { id } = req.params;
+    const { name, description, slug, price, isActive } = req.body;
+    const product = await Product.findOneById(id);
+    if (!product) {
+      res.status(404).json({
+        status: false,
+        message: 'Product not found',
+      });
+    }
+    if (name) {
+      product.name = name;
+    }
+    if (description) {
+      product.description = description;
+    }
+    if (slug) {
+      product.slug = slug;
+    }
+    if (price) {
+      product.price = price;
+    }
+    if (isActive) {
+      product.isActive = isActive;
+    }
+    await product.save();
+    res.status(200).json({
+      status: true,
+      message: 'Product updated',
+      data: product,
+    });
+  },
+);
 
 export default {
   getAllProduct,
@@ -218,4 +256,5 @@ export default {
   createProduct,
   addNewProductItem,
   getAllProductAdmin,
+  updateProduct,
 };

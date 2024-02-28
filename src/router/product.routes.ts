@@ -10,6 +10,7 @@ import {
   NewProductBodyValidator,
   ProductAndProductTagParamValidator,
   ProductItemValidator,
+  UpdateProductRequestBodyValidator,
   productQuerySchema,
 } from '@/validator/product.validator.js';
 import { Router } from 'express';
@@ -34,6 +35,15 @@ productRouter.get(
 );
 productRouter.use(extractUser);
 productRouter.use(restrictUser(ROLES.ADMIN, ROLES.SUPER_ADMIN));
+
+productRouter.patch(
+  '/:id',
+  ValidateRequestNew({
+    reqBodySchema: UpdateProductRequestBodyValidator,
+    paramSchema: praramIdValidator,
+  }),
+  productController.updateProduct,
+);
 
 productRouter.post(
   '/',
