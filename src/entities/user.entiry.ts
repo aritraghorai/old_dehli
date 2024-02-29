@@ -16,6 +16,7 @@ import {
   Unique,
 } from 'typeorm';
 import { ProductItem } from './product.entity.js';
+import { Image } from './image.entity.js';
 
 @Entity()
 export class Role extends BaseEntity {
@@ -31,6 +32,28 @@ export class Role extends BaseEntity {
 
   @Column({ default: true, type: 'boolean' })
   isVerified: Boolean;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+}
+
+@Entity()
+export class UserProfile extends BaseEntity {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column({ type: 'varchar' })
+  fullName: string;
+
+  @Column({ type: 'varchar' })
+  bio: string;
+
+  @OneToOne(() => Image, { onDelete: 'NO ACTION' })
+  @JoinColumn({ name: 'image_id' })
+  image: Image;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -66,6 +89,10 @@ export class User extends BaseEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 
+  @OneToOne(() => UserProfile, { onDelete: 'NO ACTION' })
+  @JoinColumn({ name: 'profile_id' })
+  profile: UserProfile;
+
   @ManyToMany(() => Role, { eager: true, onDelete: 'NO ACTION' })
   @JoinTable()
   role: Role[];
@@ -86,9 +113,57 @@ export class UserCart extends BaseEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToMany(() => CartItem, p => p.cart, { eager: true, onDelete: 'NO ACTION' })
+  @OneToMany(() => CartItem, p => p.cart, {
+    eager: true,
+    onDelete: 'NO ACTION',
+  })
   @JoinColumn({ name: 'product_id' })
   cardItems: CartItem[];
+}
+
+@Entity()
+export class UserFavorite extends BaseEntity {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @OneToOne(() => User, { onDelete: 'NO ACTION' })
+  @JoinColumn({ name: 'user_id' })
+  user: User;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @OneToMany(() => FavoriteItem, p => p.userFavorite, {
+    eager: true,
+    onDelete: 'NO ACTION',
+  })
+  @JoinColumn({ name: 'product_id' })
+  favoriteItems: FavoriteItem[];
+}
+
+@Entity()
+export class FavoriteItem extends BaseEntity {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @ManyToOne(() => UserFavorite, p => p.id, {
+    onDelete: 'NO ACTION',
+  })
+  @JoinColumn({ name: 'favorite_id' })
+  userFavorite: UserFavorite;
+
+  @OneToOne(() => ProductItem, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'product_id' })
+  productItem: ProductItem;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }
 
 @Entity()

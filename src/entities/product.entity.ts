@@ -14,7 +14,6 @@ import {
 } from 'typeorm';
 import { Image } from './image.entity.js';
 import { Category } from './category.entity.js';
-import { boolean } from 'zod';
 
 @Entity()
 export class ProductTag extends BaseEntity {

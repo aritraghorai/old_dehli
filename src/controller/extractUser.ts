@@ -25,6 +25,9 @@ const extractUser = catchAsync(
       },
       relations: {
         role: true,
+        profile: {
+          image: true,
+        },
       },
     });
     if (!user) {

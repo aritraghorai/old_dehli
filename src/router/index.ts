@@ -9,6 +9,7 @@ import userAddressRouter from './userAddress.router.js';
 import orderRouter from './order.routes.js';
 import productTagRouter from './productTag.routes.js';
 import productOptionRoute from './productOption.routes.js';
+import userRouter from './user.routes.js';
 
 const router = Router();
 
@@ -22,5 +23,6 @@ router.use('/user-address', userAddressRouter);
 router.use('/order', orderRouter);
 router.use('/product-tag', productTagRouter);
 router.use('/product-option', productOptionRoute);
+router.use('/user', userRouter);
 
 export default router;
