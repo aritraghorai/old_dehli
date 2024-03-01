@@ -10,6 +10,7 @@ import {
   NewProductBodyValidator,
   ProductAndProductTagParamValidator,
   ProductItemValidator,
+  UpdateProductItemValidator,
   UpdateProductRequestBodyValidator,
   productQuerySchema,
 } from '@/validator/product.validator.js';
@@ -72,6 +73,15 @@ productRouter.post(
   '/:id/item',
   ValidateRequest(ProductItemValidator, undefined, praramIdValidator),
   productController.addNewProductItem,
+);
+
+productRouter.patch(
+  '/item/:id',
+  ValidateRequestNew({
+    reqBodySchema: UpdateProductItemValidator,
+    paramSchema: praramIdValidator,
+  }),
+  productController.updateProductItem,
 );
 
 export default productRouter;

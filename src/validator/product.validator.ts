@@ -48,9 +48,23 @@ export const UpdateProductRequestBodyValidator = z.object({
   isActive: z.boolean().optional(),
 });
 
+export const UpdateProductItemValidator = z.object({
+  sku: z.string().min(3).max(20),
+  stock: z.coerce
+    .number()
+    .positive()
+    .transform(val => +val),
+  price: z.coerce
+    .number()
+    .positive()
+    .transform(val => +val),
+  optionValues: z.array(z.string().uuid()).optional(),
+});
+
 export type UpdateProductRequestBody = z.infer<
   typeof UpdateProductRequestBodyValidator
 >;
+export type UpdateProductItemBody = z.infer<typeof UpdateProductItemValidator>;
 
 export type NewProductItem = z.infer<typeof ProductItemValidator>;
 

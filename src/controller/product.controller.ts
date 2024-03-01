@@ -4,12 +4,14 @@ import {
   ProductCofiguration,
   ProductItem,
 } from '@/entities/product.entity.js';
+import AppError from '@/utils/AppError.js';
 import { myDataSource } from '@/utils/app-data-source.js';
 import catchAsync from '@/utils/catchAsync.js';
 import {
   NewProductBody,
   NewProductItem,
   ProductQuery,
+  UpdateProductItemBody,
   UpdateProductRequestBody,
 } from '@/validator/product.validator.js';
 import { NextFunction, Request, Response } from 'express';
@@ -214,6 +216,65 @@ const addNewProductItem = catchAsync(
     });
   },
 );
+
+//Update product Item
+const updateProductItem = catchAsync(
+  async (
+    req: Request<{ id: string }, any, UpdateProductItemBody>,
+    res: Response,
+  ) => {
+    const { id } = req.params;
+    const { sku, stock, price, optionValues = [] } = req.body;
+    const productItem = await ProductItem.findOneById(id);
+    if (!productItem) {
+      throw new AppError('Product item not found', 404);
+    }
+    productItem.sku = sku;
+    productItem.stock = stock;
+    productItem.price = price;
+    //check if option value exist or not
+    for (const optionValue of optionValues) {
+      //check option value exist or not
+      const optionValueExist = productItem.productConfig.find(
+        a => a.optionValue.id === optionValue,
+      );
+      if (optionValueExist) {
+        continue;
+      }
+      //create new product configuration
+      //find option value
+      const findOptionValue = await OptionValue.findOneById(optionValue);
+      if (!findOptionValue) {
+        throw new AppError('Option value not found', 404);
+      }
+      const productConfig = ProductCofiguration.create({
+        productItem: {
+          id: id,
+        },
+        optionValue: {
+          id: optionValue,
+        },
+        option: {
+          id: findOptionValue.option.id,
+        },
+      });
+      await productConfig.save();
+    }
+    //delete option value
+    for (const productConfig of productItem.productConfig) {
+      if (!optionValues.includes(productConfig.optionValue.id)) {
+        await productConfig.remove();
+      }
+    }
+    await productItem.save();
+    res.status(200).json({
+      status: true,
+      message: 'Product item updated',
+      data: productItem,
+    });
+  },
+);
+
 const updateProduct = catchAsync(
   async (
     req: Request<{ id: string }, any, UpdateProductRequestBody>,
@@ -257,4 +318,5 @@ export default {
   addNewProductItem,
   getAllProductAdmin,
   updateProduct,
+  updateProductItem,
 };
