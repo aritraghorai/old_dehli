@@ -65,8 +65,11 @@ const updateShop = catchAsync(
         id,
       },
     });
-    const { isActive } = req.body;
+    const { isActive, name, description } = req.body;
     shop.isActive = isActive;
+    shop.name = name || shop.name;
+    shop.description = description || shop.description;
+    shop.slug = faker.helpers.slugify(shop.name);
     await shop.save();
     res.status(200).json({
       status: true,

@@ -16,6 +16,9 @@ export const NewShopValidator = z.object({
 
 export const updateShopValidator = z.object({
   isActive: z.boolean().optional(),
+  name: z.string().min(3).max(255).optional(),
+  description: z.string().min(3).max(255).optional(),
+  images: z.array(z.string().uuid()).optional(),
 });
 
 export type UpdateShopValidatorType = z.infer<typeof updateShopValidator>;

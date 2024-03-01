@@ -3,7 +3,10 @@ import { categoryRepository } from '@/orm/datasources/index.js';
 import AppError from '@/utils/AppError.js';
 import { myDataSource } from '@/utils/app-data-source.js';
 import catchAsync from '@/utils/catchAsync.js';
-import { NewCategoryValidatorType } from '@/validator/category.validator.js';
+import {
+  NewCategoryValidatorType,
+  UpdateCategoryValidatorType,
+} from '@/validator/category.validator.js';
 import { NextFunction, Request, Response } from 'express';
 
 const createCatagory = catchAsync(
@@ -69,8 +72,43 @@ const getAllCatagoryAll = catchAsync(
   },
 );
 
+const updateCatagory = catchAsync(
+  async (
+    req: Request<{ id: string }, any, UpdateCategoryValidatorType>,
+    res: Response,
+  ) => {
+    const { id } = req.params;
+    const { name, description, slug, parentCategoryId } = req.body;
+    const catagory = await Category.findOneById(id);
+    if (!catagory) {
+      return res.status(404).json({
+        status: false,
+        message: 'Catagory not found',
+      });
+    }
+    catagory.name = name || catagory.name;
+    catagory.description = description || catagory.description;
+    catagory.slug = slug || catagory.slug;
+
+    if (parentCategoryId) {
+      const findParentCategory =
+        await categoryRepository.findOneById(parentCategoryId);
+      if (!findParentCategory) {
+        catagory.parent = findParentCategory;
+      }
+    }
+
+    await categoryRepository.save(catagory);
+    return res.status(200).json({
+      status: true,
+      data: catagory,
+    });
+  },
+);
+
 export default {
   createCatagory,
   getAllCatagory,
   getAllCatagoryAll,
+  updateCatagory,
 };
