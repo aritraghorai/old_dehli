@@ -33,8 +33,10 @@ const getAllProduct = catchAsync(
         },
         shop: {
           slug: shop ? Like(`%${shop}%`) : Like(`%%`),
+          isActive: true,
         },
         productItems: MoreThan(0),
+        isActive: true,
       },
       relations: {
         category: true,
