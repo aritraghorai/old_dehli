@@ -238,9 +238,7 @@ const updateProduct = catchAsync(
     if (price) {
       product.price = price;
     }
-    if (isActive) {
-      product.isActive = isActive;
-    }
+    if (isActive !== undefined) product.isActive = isActive;
     await product.save();
     res.status(200).json({
       status: true,
