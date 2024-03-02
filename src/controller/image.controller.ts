@@ -27,12 +27,16 @@ const uploadImge = catchAsync(
 );
 
 const deleteImage = async (imageId: string) => {
-  const image = await ImageRepository.findOneById(imageId);
+  const image = await ImageRepository.findOne({
+    where: { id: imageId },
+    select: ['id', 'path', 'url'],
+  });
   if (!image) {
     throw new AppError('Image not found', 404);
   }
   console.log(image);
   if (image.url.includes(env.BACKEND_URL)) {
+    console.log('delete image', image.path);
     await fs.unlink(image.path);
   }
   await ImageRepository.remove(image);

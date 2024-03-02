@@ -1,11 +1,15 @@
 import extractUser from '@/controller/extractUser.js';
 import productController from '@/controller/product.controller.js';
+import productItemController from '@/controller/productItem.controller.js';
 import productTagController from '@/controller/productTag.controller.js';
 import ValidateRequest from '@/middleware/ValidateRequest.js';
 import ValidateRequestNew from '@/middleware/ValidateRequestNew.js';
 import restrictUser from '@/middleware/restrictUser.middleware.js';
 import { ROLES } from '@/utils/Constant.js';
-import { praramIdValidator } from '@/validator/common.validator.js';
+import {
+  commonImageValidatorBody,
+  praramIdValidator,
+} from '@/validator/common.validator.js';
 import {
   NewProductBodyValidator,
   ProductAndProductTagParamValidator,
@@ -83,5 +87,22 @@ productRouter.patch(
   }),
   productController.updateProductItem,
 );
+
+productRouter
+  .route('/item/:id/image')
+  .delete(
+    ValidateRequestNew({
+      paramSchema: praramIdValidator,
+      reqBodySchema: commonImageValidatorBody,
+    }),
+    productItemController.deleteProductItemImage,
+  )
+  .post(
+    ValidateRequestNew({
+      paramSchema: praramIdValidator,
+      reqBodySchema: commonImageValidatorBody,
+    }),
+    productItemController.addProductItemImage,
+  );
 
 export default productRouter;
