@@ -1,7 +1,12 @@
 import extractUser from '@/controller/extractUser.js';
 import shopController from '@/controller/shop.controller.js';
 import ValidateRequestNew from '@/middleware/ValidateRequestNew.js';
-import { praramIdValidator } from '@/validator/common.validator.js';
+import restrictUser from '@/middleware/restrictUser.middleware.js';
+import { ROLES } from '@/utils/Constant.js';
+import {
+  commonImageValidatorBody,
+  praramIdValidator,
+} from '@/validator/common.validator.js';
 import {
   NewShopValidator,
   shopQuerySchema,
@@ -19,6 +24,7 @@ shopRouter.get(
   shopController.getAllShops,
 );
 shopRouter.use(extractUser);
+shopRouter.use(restrictUser(ROLES.ADMIN, ROLES.SUPER_ADMIN));
 
 shopRouter.get('/all', shopController.getAllShopsAll);
 
@@ -38,5 +44,21 @@ shopRouter.put(
   }),
   shopController.updateShop,
 );
+shopRouter
+  .route('/:id/image')
+  .delete(
+    ValidateRequestNew({
+      paramSchema: praramIdValidator,
+      reqBodySchema: commonImageValidatorBody,
+    }),
+    shopController.deleteShopImage,
+  )
+  .post(
+    ValidateRequestNew({
+      paramSchema: praramIdValidator,
+      reqBodySchema: commonImageValidatorBody,
+    }),
+    shopController.addShopImage,
+  );
 
 export default shopRouter;

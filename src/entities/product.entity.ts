@@ -98,7 +98,7 @@ export class Shop extends BaseEntity {
   @Column({ type: 'boolean', default: true })
   isActive: boolean;
 
-  @ManyToMany(() => Image, { eager: true, onDelete: 'NO ACTION' })
+  @ManyToMany(() => Image, { eager: true, onDelete: 'CASCADE' })
   @JoinTable({ name: 'restruent_image' })
   images: Image[];
 

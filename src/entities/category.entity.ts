@@ -40,7 +40,7 @@ export class Category extends BaseEntity {
   @Column({ nullable: true, type: 'text' })
   description: string;
 
-  @ManyToOne(() => Image, { eager: true, onDelete: 'NO ACTION' })
+  @ManyToOne(() => Image, { eager: true, onDelete: 'SET NULL' })
   @JoinColumn({ name: 'imageId' })
   image: Image;
 }
