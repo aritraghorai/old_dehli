@@ -14,7 +14,7 @@ import AppError from '@/utils/AppError.js';
 import { myDataSource } from '@/utils/app-data-source.js';
 import catchAsync from '@/utils/catchAsync.js';
 import { QueryPageType } from '@/validator/common.validator.js';
-import { OrderBody } from '@/validator/order.validator.js';
+import { OrderBody, UpdateOrderBody } from '@/validator/order.validator.js';
 import { Request, Response } from 'express';
 
 const createOrder = catchAsync(
@@ -141,4 +141,38 @@ const getOrders = catchAsync(
   },
 );
 
-export default { createOrder, getOrders };
+const getAllOrdersAdmin = catchAsync(async (req: Request, res: Response) => {
+  const orderRepo = myDataSource.getRepository(Order);
+  const orders = await orderRepo.find({
+    relations: {
+      orderAddress: true,
+      orderItems: {
+        productItem: true,
+      },
+    },
+  });
+  return res.status(200).json({
+    status: true,
+    data: orders,
+  });
+});
+
+const updateOrder = catchAsync(
+  async (req: Request<{ id: string }, any, UpdateOrderBody>, res: Response) => {
+    const orderRepo = myDataSource.getRepository(Order);
+    const order = await orderRepo.findOne({ where: { id: req.params.id } });
+    if (!order) {
+      throw new AppError('Order not found', 404);
+    }
+    order.status = req.body.status || order.status;
+    order.paymentStatus = req.body.paymentStatus || order.paymentStatus;
+    await orderRepo.save(order);
+    return res.status(200).json({
+      status: true,
+      message: 'Order updated successfully',
+      data: order,
+    });
+  },
+);
+
+export default { createOrder, getOrders, getAllOrdersAdmin, updateOrder };

@@ -27,19 +27,20 @@ const getAllProduct = catchAsync(
     const [products, total] = await Product.findAndCount({
       skip: (page - 1) * limit,
       take: limit,
-      where: {
-        name: search ? Like(`%${search}%`) : Like(`%%`),
-        description: search ? Like(`%${search}%`) : Like(`%%`),
-        category: {
-          slug: category ? Like(`%${category}%`) : Like(`%%`),
-        },
-        shop: {
-          slug: shop ? Like(`%${shop}%`) : Like(`%%`),
+      where: [
+        {
+          slug: search ? Like(`%${search}%`) : Like(`%%`),
+          category: {
+            slug: category ? Like(`%${category}%`) : Like(`%%`),
+          },
+          shop: {
+            slug: shop ? Like(`%${shop}%`) : Like(`%%`),
+            isActive: true,
+          },
+          productItems: MoreThan(0),
           isActive: true,
         },
-        productItems: MoreThan(0),
-        isActive: true,
-      },
+      ],
       relations: {
         category: true,
         shop: true,
@@ -67,16 +68,41 @@ const getAllProductAdmin = catchAsync(
     const [products, total] = await Product.findAndCount({
       skip: (page - 1) * limit,
       take: limit,
-      where: {
-        name: search ? Like(`%${search}%`) : Like(`%%`),
-        description: search ? Like(`%${search}%`) : Like(`%%`),
-        category: {
-          slug: category ? Like(`%${category}%`) : Like(`%%`),
+      where: [
+        {
+          slug: search ? Like(`%${search}%`) : Like(`%%`),
+          category: {
+            slug: category ? Like(`%${category}%`) : Like(`%%`),
+          },
+          shop: {
+            slug: shop ? Like(`%${shop}%`) : Like(`%%`),
+            isActive: true,
+          },
+          isActive: true,
         },
-        shop: {
-          slug: shop ? Like(`%${shop}%`) : Like(`%%`),
+        {
+          name: search ? Like(`%${search}%`) : Like(`%%`),
+          category: {
+            slug: category ? Like(`%${category}%`) : Like(`%%`),
+          },
+          shop: {
+            slug: shop ? Like(`%${shop}%`) : Like(`%%`),
+            isActive: true,
+          },
+          isActive: true,
         },
-      },
+        {
+          description: search ? Like(`%${search}%`) : Like(`%%`),
+          category: {
+            slug: category ? Like(`%${category}%`) : Like(`%%`),
+          },
+          shop: {
+            slug: shop ? Like(`%${shop}%`) : Like(`%%`),
+            isActive: true,
+          },
+          isActive: true,
+        },
+      ],
       relations: {
         category: true,
         shop: true,
