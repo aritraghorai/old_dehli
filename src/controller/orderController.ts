@@ -129,7 +129,14 @@ const getOrders = catchAsync(
       where: { user: { id: user.id } },
       take: limit,
       skip: (page - 1) * limit,
-      relations: ['orderAddress', 'orderItems'],
+      relations: {
+        orderAddress: true,
+        orderItems: {
+          productItem: {
+            images: true
+          }
+        },
+      }
     });
     return res.status(200).json({
       status: true,
