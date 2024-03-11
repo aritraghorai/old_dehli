@@ -33,7 +33,7 @@ const createCatagory = catchAsync(
     if (parentCategoryId) {
       const findParentCategory =
         await categoryRepository.findOneById(parentCategoryId);
-      if (!findParentCategory) {
+      if (findParentCategory) {
         NewCatagory.parent = findParentCategory;
       }
     }
@@ -93,8 +93,8 @@ const updateCatagory = catchAsync(
     if (parentCategoryId) {
       const findParentCategory =
         await categoryRepository.findOneById(parentCategoryId);
-      if (!findParentCategory) {
-        catagory.parent = findParentCategory;
+      if (findParentCategory) {
+        catagory.parent = findParentCategory
       }
     }
 

@@ -10,6 +10,7 @@ import {
 import { ProductItem } from '@/entities/product.entity.js';
 import { CartItem, User, UserCart } from '@/entities/user.entiry.js';
 import { createOrderRazerPay } from '@/services/payment/razorpay.service.js';
+import whatshapp from '@/services/whatshapp/index.js';
 import AppError from '@/utils/AppError.js';
 import { myDataSource } from '@/utils/app-data-source.js';
 import catchAsync from '@/utils/catchAsync.js';
@@ -93,6 +94,12 @@ const createOrder = catchAsync(
         // send sms
         // send email
         // send notification
+        await whatshapp.sendMessage(
+          `${user.name}, your order has been placed successfully.
+ Your order id is ${newOrder.id} and total amount is ${newOrder.grandTotal}.
+ Our delivery executive will contact you soon. Thank you for shopping with us.`,
+          user.phoneNumber,
+        );
         return res.status(201).json({
           status: true,
           message: 'Order created successfully',
@@ -133,10 +140,10 @@ const getOrders = catchAsync(
         orderAddress: true,
         orderItems: {
           productItem: {
-            images: true
-          }
+            images: true,
+          },
         },
-      }
+      },
     });
     return res.status(200).json({
       status: true,

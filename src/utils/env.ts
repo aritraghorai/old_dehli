@@ -11,4 +11,5 @@ export default {
   BACKEND_URL: process.env.BACKEND_URL,
   RAZORPAY_KEY_ID: process.env.RAZORPAY_KEY_ID,
   RAZOR_PAY_KEY_SECRET: process.env.RAZOR_PAY_KEY_SECRET,
+  WHATSAPP_API_KEY: process.env.WHATSAPP_API_KEY,
 };
