@@ -50,7 +50,9 @@ const getAllCatagory = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const catagory = await myDataSource.manager
       .getTreeRepository(Category)
-      .findTrees();
+      .findTrees({
+        relations: ['parent'],
+      });
     return res.status(200).json({
       status: true,
       data: catagory,
@@ -94,7 +96,7 @@ const updateCatagory = catchAsync(
       const findParentCategory =
         await categoryRepository.findOneById(parentCategoryId);
       if (findParentCategory) {
-        catagory.parent = findParentCategory
+        catagory.parent = findParentCategory;
       }
     }
 
