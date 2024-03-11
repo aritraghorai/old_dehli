@@ -46,6 +46,7 @@ export const UpdateProductRequestBodyValidator = z.object({
     .optional()
     .transform(val => +val),
   isActive: z.boolean().optional(),
+  categoryId: z.string().uuid().optional(),
 });
 
 export const UpdateProductItemValidator = z.object({

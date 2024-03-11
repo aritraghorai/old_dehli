@@ -1,3 +1,4 @@
+import { Category } from '@/entities/category.entity.js';
 import {
   OptionValue,
   Product,
@@ -307,7 +308,7 @@ const updateProduct = catchAsync(
     res: Response,
   ) => {
     const { id } = req.params;
-    const { name, description, slug, price, isActive } = req.body;
+    const { name, description, slug, price, isActive, categoryId } = req.body;
     const product = await Product.findOneById(id);
     if (!product) {
       res.status(404).json({
@@ -326,6 +327,16 @@ const updateProduct = catchAsync(
     }
     if (price) {
       product.price = price;
+    }
+    if (categoryId) {
+      const category = await Category.findOneById(categoryId);
+      if (!category) {
+        res.status(404).json({
+          status: false,
+          message: 'Category not found',
+        });
+      }
+      product.category = category;
     }
     if (isActive !== undefined) product.isActive = isActive;
     await product.save();
