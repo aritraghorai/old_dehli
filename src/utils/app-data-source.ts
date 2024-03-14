@@ -6,7 +6,7 @@ export const myDataSource = new DataSource({
   url: env.DATABASE_URL,
   migrationsTableName: 'migrations',
   migrations: ['src/orm/migrations/*.ts'],
-  entities: ['src/entities/**/*{.ts,.js}'],
+  entities: ['src/entities/**/*.ts'],
   logging: true,
-  synchronize: true,
+  synchronize: false,
 });

@@ -80,6 +80,7 @@ export class OptionValue extends BaseEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 }
+
 @Entity()
 @Unique(['name'])
 export class Shop extends BaseEntity {
@@ -101,6 +102,31 @@ export class Shop extends BaseEntity {
   @ManyToMany(() => Image, { eager: true, onDelete: 'CASCADE' })
   @JoinTable({ name: 'restruent_image' })
   images: Image[];
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+}
+
+@Entity()
+export class ProductType extends BaseEntity {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column({ type: 'varchar' })
+  name: string;
+
+  @Column({ unique: true, type: 'varchar' })
+  slug: string;
+
+  @Column({ nullable: true, type: 'text' })
+  description: string;
+
+  @ManyToOne(() => Image, { eager: true, onDelete: 'NO ACTION' })
+  @JoinColumn({ name: 'imageId' })
+  image: Image;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -149,6 +175,13 @@ export class Product extends BaseEntity {
 
   @Column({ type: 'boolean', default: true })
   isActive: boolean;
+
+  @ManyToOne(() => ProductType, pt => pt.id, {
+    eager: true,
+    onDelete: 'NO ACTION',
+  })
+  @JoinColumn({ name: 'productTypeId' })
+  type: ProductType;
 
   @ManyToOne(() => Category, c => c.id, { eager: false, onDelete: 'NO ACTION' })
   @JoinColumn({ name: 'categoryId' })
