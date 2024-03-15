@@ -32,3 +32,5 @@ productTypeRouter.route('/:id').patch(
   }),
   productTypeController.updateProductType,
 );
+
+export default productTypeRouter;

@@ -252,10 +252,21 @@ const updateProductItem = catchAsync(
   ) => {
     const { id } = req.params;
     const { sku, stock, price, optionValues = [] } = req.body;
-    const productItem = await ProductItem.findOneById(id);
+    const productItem = await ProductItem.findOne({
+      where: {
+        id,
+      },
+      relations: {
+        productConfig: {
+          option: true,
+          optionValue: true
+        }
+      }
+    })
     if (!productItem) {
       throw new AppError('Product item not found', 404);
     }
+    console.log(productItem);
     productItem.sku = sku;
     productItem.stock = stock;
     productItem.price = price;
@@ -270,7 +281,14 @@ const updateProductItem = catchAsync(
       }
       //create new product configuration
       //find option value
-      const findOptionValue = await OptionValue.findOneById(optionValue);
+      const findOptionValue = await OptionValue.findOne({
+        where: {
+          id: optionValue,
+        },
+        relations: {
+          option: true,
+        },
+      });
       if (!findOptionValue) {
         throw new AppError('Option value not found', 404);
       }
@@ -286,10 +304,11 @@ const updateProductItem = catchAsync(
         },
       });
       await productConfig.save();
+      productItem.productConfig.push(productConfig);
     }
     //delete option value
     for (const productConfig of productItem.productConfig) {
-      if (!optionValues.includes(productConfig.optionValue.id)) {
+      if (!optionValues.some(op => productConfig.optionValue.id === op)) {
         await productConfig.remove();
       }
     }

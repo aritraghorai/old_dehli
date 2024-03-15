@@ -69,7 +69,7 @@ export class OptionValue extends BaseEntity {
   @ManyToOne(
     () => Option,
     productVariationOption => productVariationOption.Options,
-    { eager: false, onDelete: 'CASCADE' },
+    { eager: true, onDelete: 'CASCADE' },
   )
   @JoinColumn({ name: 'optionId' })
   option: Option;

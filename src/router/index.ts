@@ -11,6 +11,7 @@ import productTagRouter from './productTag.routes.js';
 import productOptionRoute from './productOption.routes.js';
 import userRouter from './user.routes.js';
 import favoriteRouter from './favorite.rotes.js';
+import productTypeRouter from './productType.rotes.js';
 
 const router = Router();
 
@@ -25,6 +26,7 @@ router.use('/user-address', userAddressRouter);
 router.use('/order', orderRouter);
 router.use('/product-tag', productTagRouter);
 router.use('/product-option', productOptionRoute);
+router.use('/product-type', productTypeRouter);
 router.use('/user', userRouter);
 
 export default router;
