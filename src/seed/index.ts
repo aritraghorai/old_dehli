@@ -7,6 +7,7 @@ import {
   ProductCofiguration,
   ProductItem,
   ProductTag,
+  ProductType,
   Shop,
 } from '@/entities/product.entity.js';
 import { myDataSource } from '@/utils/app-data-source.js';
@@ -24,6 +25,7 @@ await myDataSource.getRepository(OptionValue).delete({});
 await myDataSource.getRepository(ProductCofiguration).delete({});
 await myDataSource.getRepository(ProductItem).delete({});
 await myDataSource.getRepository(Shop).delete({});
+await myDataSource.getRepository(ProductType).delete({});
 //add data
 
 const images: Array<Image> = [];
@@ -33,6 +35,7 @@ const productTags: Array<ProductTag> = [];
 const productOptions: Map<string, Array<OptionValue>> = new Map();
 const productConfigurations: ProductCofiguration[] = [];
 const shops: Array<Shop> = [];
+const productTypes: Array<ProductType> = [];
 
 await myDataSource.transaction(async manager => {
   //add images
@@ -76,6 +79,19 @@ await myDataSource.transaction(async manager => {
     newCategory.image = faker.helpers.arrayElement(images);
     catagories.push(await newCategory.save());
   }
+  //add product types
+  const productTypeRepository = manager.getRepository(ProductType);
+
+  const foodProductTypes = ['Veg', 'Non-Veg', 'Vegan', 'Vegetarian'];
+
+  for (let i = 1; i <= foodProductTypes.length; i++) {
+    const newProductType = productTypeRepository.create();
+    newProductType.name = foodProductTypes[i - 1];
+    newProductType.slug = faker.helpers.slugify(newProductType.name);
+    newProductType.description = faker.commerce.productDescription();
+    newProductType.image = faker.helpers.arrayElement(images);
+    productTypes.push(await newProductType.save());
+  }
   // add product tags
   const productTagRepository = manager.getRepository(ProductTag);
   const foodProductTags = [
@@ -116,6 +132,7 @@ await myDataSource.transaction(async manager => {
       description: faker.commerce.productDescription(),
       category: faker.helpers.arrayElement(catagories),
       shop: faker.helpers.arrayElement(shops),
+      type: faker.helpers.arrayElement(productTypes),
       productTag: [
         faker.helpers.arrayElement(productTags),
         faker.helpers.arrayElement(productTags),
@@ -158,7 +175,7 @@ await myDataSource.transaction(async manager => {
         productConfiguration.productItem = productItem;
         productConfiguration.option = option;
         productConfiguration.optionValue = productOptions.get(option.id)[j];
-        await productConfiguration.save()
+        await productConfiguration.save();
       }
     } else {
       const productItem = productItemRepository.create();
