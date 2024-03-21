@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class Initial1711005019531 implements MigrationInterface {
-    name = 'Initial1711005019531'
+export class Initial1711048830236 implements MigrationInterface {
+    name = 'Initial1711048830236'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`CREATE TABLE "time_slot" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "slot" character varying(255) NOT NULL, "startTime" TIME NOT NULL, "endTime" TIME NOT NULL, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "UQ_0e1bd1e5eb1a5e57c1f5eeaf958" UNIQUE ("slot"), CONSTRAINT "PK_03f782f8c4af029253f6ad5bacf" PRIMARY KEY ("id"))`);
@@ -28,12 +28,12 @@ export class Initial1711005019531 implements MigrationInterface {
         await queryRunner.query(`CREATE TABLE "user_favorite" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), "user_id" uuid, CONSTRAINT "REL_1d722c57635dc707eca7cf15af" UNIQUE ("user_id"), CONSTRAINT "PK_e161413fbdd7d2592f727858739" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "favorite_item" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), "favorite_id" uuid, "product_id" uuid, CONSTRAINT "REL_3eee7ce905fad8746dfb39c505" UNIQUE ("product_id"), CONSTRAINT "PK_fa18c8a7e7b3aa288ebd18885d0" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "cart_item" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "count" integer NOT NULL, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), "cart_id" uuid, "product_id" uuid, CONSTRAINT "UQ_38adfe5eca85cb882f6dc0722cc" UNIQUE ("cart_id", "product_id"), CONSTRAINT "PK_bd94725aa84f8cf37632bcde997" PRIMARY KEY ("id"))`);
-        await queryRunner.query(`CREATE TABLE "otp" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "otp" character varying NOT NULL, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), "userId" uuid, CONSTRAINT "PK_32556d9d7b22031d7d0e1fd6723" PRIMARY KEY ("id"))`);
-        await queryRunner.query(`CREATE TABLE "order_address" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "name" character varying NOT NULL, "mobile" character varying NOT NULL, "alternatePhone" character varying, "pincode" character varying NOT NULL, "locality" character varying NOT NULL, "address" character varying NOT NULL, "city" character varying NOT NULL, "landmark" character varying NOT NULL, "state" character varying NOT NULL, "deliveryDate" date NOT NULL, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), "timeSlotId" uuid, CONSTRAINT "PK_f07603e96b068aae820d4590270" PRIMARY KEY ("id"))`);
-        await queryRunner.query(`CREATE TABLE "billing_address" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "name" character varying NOT NULL, "pincode" character varying NOT NULL, "locality" character varying NOT NULL, "address" character varying NOT NULL, "city" character varying NOT NULL, "landmark" character varying NOT NULL, "state" character varying NOT NULL, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "PK_2a9547c7062edcb3034a1fb9ebf" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TABLE "order_address" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "name" character varying NOT NULL, "mobile" character varying NOT NULL, "alternatePhone" character varying, "locality" character varying NOT NULL, "address" character varying NOT NULL, "city" character varying NOT NULL, "landmark" character varying NOT NULL, "state" character varying NOT NULL, "deliveryDate" date NOT NULL, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), "pincodeId" uuid, "timeSlotId" uuid, CONSTRAINT "PK_f07603e96b068aae820d4590270" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TABLE "billing_address" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "name" character varying NOT NULL, "locality" character varying NOT NULL, "address" character varying NOT NULL, "city" character varying NOT NULL, "landmark" character varying NOT NULL, "state" character varying NOT NULL, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), "pincodeId" uuid, CONSTRAINT "PK_2a9547c7062edcb3034a1fb9ebf" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "razorpay_payment" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "orderId" character varying NOT NULL, "paymentId" character varying NOT NULL, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "PK_3624d91a4e217dcbef7fddddf9d" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "order" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "orderNumber" character varying, "discount" double precision NOT NULL DEFAULT '0', "grandTotal" double precision NOT NULL, "status" character varying NOT NULL, "orderId" character varying, "paymentGateway" character varying NOT NULL, "paymentStatus" character varying NOT NULL, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), "user_id" uuid, "order_address_id" uuid, "billing_address_id" uuid, "razorpay_payment_id" uuid, CONSTRAINT "REL_4e9546e160d94997ebf123aa0a" UNIQUE ("order_address_id"), CONSTRAINT "REL_5568d3b9ce9f7abeeb37511ecf" UNIQUE ("billing_address_id"), CONSTRAINT "REL_c42fb6e5ec6fd97cf57e2680f2" UNIQUE ("razorpay_payment_id"), CONSTRAINT "PK_1031171c13130102495201e3e20" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "order_item" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "quantity" integer NOT NULL, "price" double precision NOT NULL, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), "order_id" uuid, "product_item_id" uuid, CONSTRAINT "PK_d01158fe15b1ead5c26fd7f4e90" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TABLE "otp" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "otp" character varying NOT NULL, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), "userId" uuid, CONSTRAINT "PK_32556d9d7b22031d7d0e1fd6723" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "zone_pincode" ("zoneId" uuid NOT NULL, "pincodeId" uuid NOT NULL, CONSTRAINT "PK_725e10b0de57b75f3bd38b5b310" PRIMARY KEY ("zoneId", "pincodeId"))`);
         await queryRunner.query(`CREATE INDEX "IDX_5e30498748e10ad287a991c4dc" ON "zone_pincode" ("zoneId") `);
         await queryRunner.query(`CREATE INDEX "IDX_5a0a4b138bbc147dd4038ca33b" ON "zone_pincode" ("pincodeId") `);
@@ -46,9 +46,6 @@ export class Initial1711005019531 implements MigrationInterface {
         await queryRunner.query(`CREATE TABLE "product_productTag" ("productId" uuid NOT NULL, "productTagId" uuid NOT NULL, CONSTRAINT "PK_4c1071d09ec9ea3b616b1d3024a" PRIMARY KEY ("productId", "productTagId"))`);
         await queryRunner.query(`CREATE INDEX "IDX_11621b28cde3831865a69a9db1" ON "product_productTag" ("productId") `);
         await queryRunner.query(`CREATE INDEX "IDX_051e41ccc16970de25d4372f8e" ON "product_productTag" ("productTagId") `);
-        await queryRunner.query(`CREATE TABLE "product_allow_zones_zone" ("productId" uuid NOT NULL, "zoneId" uuid NOT NULL, CONSTRAINT "PK_a8e277fb9fe8c70da9ca5a3b49d" PRIMARY KEY ("productId", "zoneId"))`);
-        await queryRunner.query(`CREATE INDEX "IDX_1eee0d5879cb6fb523dd38a628" ON "product_allow_zones_zone" ("productId") `);
-        await queryRunner.query(`CREATE INDEX "IDX_48b0f4452aedbe4a19e9cd2c60" ON "product_allow_zones_zone" ("zoneId") `);
         await queryRunner.query(`CREATE TABLE "productItem_image" ("productItemId" uuid NOT NULL, "imageId" uuid NOT NULL, CONSTRAINT "PK_22d18ec835bccc0b42c4a65f98a" PRIMARY KEY ("productItemId", "imageId"))`);
         await queryRunner.query(`CREATE INDEX "IDX_ca84851e4db4fdd2711fd13559" ON "productItem_image" ("productItemId") `);
         await queryRunner.query(`CREATE INDEX "IDX_ac303313f171637a6a3b2bb7a8" ON "productItem_image" ("imageId") `);
@@ -82,24 +79,24 @@ export class Initial1711005019531 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE "favorite_item" ADD CONSTRAINT "FK_3eee7ce905fad8746dfb39c505e" FOREIGN KEY ("product_id") REFERENCES "product_item"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "cart_item" ADD CONSTRAINT "FK_b6b2a4f1f533d89d218e70db941" FOREIGN KEY ("cart_id") REFERENCES "user_cart"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "cart_item" ADD CONSTRAINT "FK_67a2e8406e01ffa24ff9026944e" FOREIGN KEY ("product_id") REFERENCES "product_item"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
-        await queryRunner.query(`ALTER TABLE "otp" ADD CONSTRAINT "FK_db724db1bc3d94ad5ba38518433" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "order_address" ADD CONSTRAINT "FK_dd69097ee596ff2f7c626d44203" FOREIGN KEY ("pincodeId") REFERENCES "pincode"("id") ON DELETE SET NULL ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "order_address" ADD CONSTRAINT "FK_98b0f2a634c3045c91c4d278d83" FOREIGN KEY ("timeSlotId") REFERENCES "time_slot"("id") ON DELETE SET NULL ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "billing_address" ADD CONSTRAINT "FK_11d1efcd452c3716d643a6311af" FOREIGN KEY ("pincodeId") REFERENCES "pincode"("id") ON DELETE SET NULL ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "order" ADD CONSTRAINT "FK_199e32a02ddc0f47cd93181d8fd" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "order" ADD CONSTRAINT "FK_4e9546e160d94997ebf123aa0ae" FOREIGN KEY ("order_address_id") REFERENCES "order_address"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "order" ADD CONSTRAINT "FK_5568d3b9ce9f7abeeb37511ecf2" FOREIGN KEY ("billing_address_id") REFERENCES "billing_address"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "order" ADD CONSTRAINT "FK_c42fb6e5ec6fd97cf57e2680f2c" FOREIGN KEY ("razorpay_payment_id") REFERENCES "razorpay_payment"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "order_item" ADD CONSTRAINT "FK_e9674a6053adbaa1057848cddfa" FOREIGN KEY ("order_id") REFERENCES "order"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "order_item" ADD CONSTRAINT "FK_6b6dd8c378acdda74832bf119a3" FOREIGN KEY ("product_item_id") REFERENCES "product_item"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "otp" ADD CONSTRAINT "FK_db724db1bc3d94ad5ba38518433" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "zone_pincode" ADD CONSTRAINT "FK_5e30498748e10ad287a991c4dc7" FOREIGN KEY ("zoneId") REFERENCES "zone"("id") ON DELETE CASCADE ON UPDATE CASCADE`);
         await queryRunner.query(`ALTER TABLE "zone_pincode" ADD CONSTRAINT "FK_5a0a4b138bbc147dd4038ca33b4" FOREIGN KEY ("pincodeId") REFERENCES "pincode"("id") ON DELETE CASCADE ON UPDATE CASCADE`);
-        await queryRunner.query(`ALTER TABLE "zone_products_product" ADD CONSTRAINT "FK_d59fc9fbe66468906ce70591ab2" FOREIGN KEY ("zoneId") REFERENCES "zone"("id") ON DELETE NO ACTION ON UPDATE CASCADE`);
-        await queryRunner.query(`ALTER TABLE "zone_products_product" ADD CONSTRAINT "FK_e196c14a293bb828e255b05b3a0" FOREIGN KEY ("productId") REFERENCES "product"("id") ON DELETE CASCADE ON UPDATE CASCADE`);
+        await queryRunner.query(`ALTER TABLE "zone_products_product" ADD CONSTRAINT "FK_d59fc9fbe66468906ce70591ab2" FOREIGN KEY ("zoneId") REFERENCES "zone"("id") ON DELETE CASCADE ON UPDATE CASCADE`);
+        await queryRunner.query(`ALTER TABLE "zone_products_product" ADD CONSTRAINT "FK_e196c14a293bb828e255b05b3a0" FOREIGN KEY ("productId") REFERENCES "product"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "restruent_image" ADD CONSTRAINT "FK_d32e4ea2c5ad2de92ce6671c5d7" FOREIGN KEY ("shopId") REFERENCES "shop"("id") ON DELETE CASCADE ON UPDATE CASCADE`);
         await queryRunner.query(`ALTER TABLE "restruent_image" ADD CONSTRAINT "FK_08cd8019a8b64692c8e58635b99" FOREIGN KEY ("imageId") REFERENCES "image"("id") ON DELETE CASCADE ON UPDATE CASCADE`);
         await queryRunner.query(`ALTER TABLE "product_productTag" ADD CONSTRAINT "FK_11621b28cde3831865a69a9db15" FOREIGN KEY ("productId") REFERENCES "product"("id") ON DELETE NO ACTION ON UPDATE CASCADE`);
         await queryRunner.query(`ALTER TABLE "product_productTag" ADD CONSTRAINT "FK_051e41ccc16970de25d4372f8e6" FOREIGN KEY ("productTagId") REFERENCES "product_tag"("id") ON DELETE CASCADE ON UPDATE CASCADE`);
-        await queryRunner.query(`ALTER TABLE "product_allow_zones_zone" ADD CONSTRAINT "FK_1eee0d5879cb6fb523dd38a628f" FOREIGN KEY ("productId") REFERENCES "product"("id") ON DELETE NO ACTION ON UPDATE CASCADE`);
-        await queryRunner.query(`ALTER TABLE "product_allow_zones_zone" ADD CONSTRAINT "FK_48b0f4452aedbe4a19e9cd2c60e" FOREIGN KEY ("zoneId") REFERENCES "zone"("id") ON DELETE CASCADE ON UPDATE CASCADE`);
         await queryRunner.query(`ALTER TABLE "productItem_image" ADD CONSTRAINT "FK_ca84851e4db4fdd2711fd135592" FOREIGN KEY ("productItemId") REFERENCES "product_item"("id") ON DELETE NO ACTION ON UPDATE CASCADE`);
         await queryRunner.query(`ALTER TABLE "productItem_image" ADD CONSTRAINT "FK_ac303313f171637a6a3b2bb7a82" FOREIGN KEY ("imageId") REFERENCES "image"("id") ON DELETE CASCADE ON UPDATE CASCADE`);
         await queryRunner.query(`ALTER TABLE "user_role_role" ADD CONSTRAINT "FK_26736dfb41d6a47ce5d8365aad7" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE NO ACTION ON UPDATE CASCADE`);
@@ -115,8 +112,6 @@ export class Initial1711005019531 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE "user_role_role" DROP CONSTRAINT "FK_26736dfb41d6a47ce5d8365aad7"`);
         await queryRunner.query(`ALTER TABLE "productItem_image" DROP CONSTRAINT "FK_ac303313f171637a6a3b2bb7a82"`);
         await queryRunner.query(`ALTER TABLE "productItem_image" DROP CONSTRAINT "FK_ca84851e4db4fdd2711fd135592"`);
-        await queryRunner.query(`ALTER TABLE "product_allow_zones_zone" DROP CONSTRAINT "FK_48b0f4452aedbe4a19e9cd2c60e"`);
-        await queryRunner.query(`ALTER TABLE "product_allow_zones_zone" DROP CONSTRAINT "FK_1eee0d5879cb6fb523dd38a628f"`);
         await queryRunner.query(`ALTER TABLE "product_productTag" DROP CONSTRAINT "FK_051e41ccc16970de25d4372f8e6"`);
         await queryRunner.query(`ALTER TABLE "product_productTag" DROP CONSTRAINT "FK_11621b28cde3831865a69a9db15"`);
         await queryRunner.query(`ALTER TABLE "restruent_image" DROP CONSTRAINT "FK_08cd8019a8b64692c8e58635b99"`);
@@ -125,14 +120,16 @@ export class Initial1711005019531 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE "zone_products_product" DROP CONSTRAINT "FK_d59fc9fbe66468906ce70591ab2"`);
         await queryRunner.query(`ALTER TABLE "zone_pincode" DROP CONSTRAINT "FK_5a0a4b138bbc147dd4038ca33b4"`);
         await queryRunner.query(`ALTER TABLE "zone_pincode" DROP CONSTRAINT "FK_5e30498748e10ad287a991c4dc7"`);
+        await queryRunner.query(`ALTER TABLE "otp" DROP CONSTRAINT "FK_db724db1bc3d94ad5ba38518433"`);
         await queryRunner.query(`ALTER TABLE "order_item" DROP CONSTRAINT "FK_6b6dd8c378acdda74832bf119a3"`);
         await queryRunner.query(`ALTER TABLE "order_item" DROP CONSTRAINT "FK_e9674a6053adbaa1057848cddfa"`);
         await queryRunner.query(`ALTER TABLE "order" DROP CONSTRAINT "FK_c42fb6e5ec6fd97cf57e2680f2c"`);
         await queryRunner.query(`ALTER TABLE "order" DROP CONSTRAINT "FK_5568d3b9ce9f7abeeb37511ecf2"`);
         await queryRunner.query(`ALTER TABLE "order" DROP CONSTRAINT "FK_4e9546e160d94997ebf123aa0ae"`);
         await queryRunner.query(`ALTER TABLE "order" DROP CONSTRAINT "FK_199e32a02ddc0f47cd93181d8fd"`);
+        await queryRunner.query(`ALTER TABLE "billing_address" DROP CONSTRAINT "FK_11d1efcd452c3716d643a6311af"`);
         await queryRunner.query(`ALTER TABLE "order_address" DROP CONSTRAINT "FK_98b0f2a634c3045c91c4d278d83"`);
-        await queryRunner.query(`ALTER TABLE "otp" DROP CONSTRAINT "FK_db724db1bc3d94ad5ba38518433"`);
+        await queryRunner.query(`ALTER TABLE "order_address" DROP CONSTRAINT "FK_dd69097ee596ff2f7c626d44203"`);
         await queryRunner.query(`ALTER TABLE "cart_item" DROP CONSTRAINT "FK_67a2e8406e01ffa24ff9026944e"`);
         await queryRunner.query(`ALTER TABLE "cart_item" DROP CONSTRAINT "FK_b6b2a4f1f533d89d218e70db941"`);
         await queryRunner.query(`ALTER TABLE "favorite_item" DROP CONSTRAINT "FK_3eee7ce905fad8746dfb39c505e"`);
@@ -166,9 +163,6 @@ export class Initial1711005019531 implements MigrationInterface {
         await queryRunner.query(`DROP INDEX "public"."IDX_ac303313f171637a6a3b2bb7a8"`);
         await queryRunner.query(`DROP INDEX "public"."IDX_ca84851e4db4fdd2711fd13559"`);
         await queryRunner.query(`DROP TABLE "productItem_image"`);
-        await queryRunner.query(`DROP INDEX "public"."IDX_48b0f4452aedbe4a19e9cd2c60"`);
-        await queryRunner.query(`DROP INDEX "public"."IDX_1eee0d5879cb6fb523dd38a628"`);
-        await queryRunner.query(`DROP TABLE "product_allow_zones_zone"`);
         await queryRunner.query(`DROP INDEX "public"."IDX_051e41ccc16970de25d4372f8e"`);
         await queryRunner.query(`DROP INDEX "public"."IDX_11621b28cde3831865a69a9db1"`);
         await queryRunner.query(`DROP TABLE "product_productTag"`);
@@ -181,12 +175,12 @@ export class Initial1711005019531 implements MigrationInterface {
         await queryRunner.query(`DROP INDEX "public"."IDX_5a0a4b138bbc147dd4038ca33b"`);
         await queryRunner.query(`DROP INDEX "public"."IDX_5e30498748e10ad287a991c4dc"`);
         await queryRunner.query(`DROP TABLE "zone_pincode"`);
+        await queryRunner.query(`DROP TABLE "otp"`);
         await queryRunner.query(`DROP TABLE "order_item"`);
         await queryRunner.query(`DROP TABLE "order"`);
         await queryRunner.query(`DROP TABLE "razorpay_payment"`);
         await queryRunner.query(`DROP TABLE "billing_address"`);
         await queryRunner.query(`DROP TABLE "order_address"`);
-        await queryRunner.query(`DROP TABLE "otp"`);
         await queryRunner.query(`DROP TABLE "cart_item"`);
         await queryRunner.query(`DROP TABLE "favorite_item"`);
         await queryRunner.query(`DROP TABLE "user_favorite"`);

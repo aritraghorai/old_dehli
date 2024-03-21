@@ -13,6 +13,7 @@ import {
 import { ProductItem } from './product.entity.js';
 import { User } from './user.entiry.js';
 import { TimeSlot } from './timeslot.entity.js';
+import { Pincode } from './address.entity.js';
 
 export enum ORDER_STATUS_ENUM {
   PENDING = 'PENDING',
@@ -45,8 +46,8 @@ export class OrderAddress extends BaseEntity {
   @Column({ type: 'varchar', nullable: true })
   alternatePhone: string;
 
-  @Column({ type: 'varchar' })
-  pincode: string;
+  @ManyToOne(() => Pincode, p => p.id, { onDelete: 'SET NULL' })
+  pincode: Pincode;
 
   @Column({ type: 'varchar' })
   locality: string;
@@ -84,8 +85,8 @@ export class BillingAddress extends BaseEntity {
   @Column({ type: 'varchar' })
   name: string;
 
-  @Column({ type: 'varchar' })
-  pincode: string;
+  @ManyToOne(() => Pincode, p => p.id, { onDelete: 'SET NULL' })
+  pincode: Pincode;
 
   @Column({ type: 'varchar' })
   locality: string;

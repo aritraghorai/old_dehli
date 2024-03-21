@@ -191,8 +191,7 @@ export class Product extends BaseEntity {
   @Column({ type: 'numeric', default: 1 })
   minOrderQuantity: number;
 
-  @ManyToMany(() => Zone, { eager: true, onDelete: 'NO ACTION' })
-  @JoinTable()
+  @ManyToMany(() => Zone, zone => zone.products)
   allowZones: Zone[];
 
   @ManyToOne(() => Category, c => c.id, { eager: false, onDelete: 'NO ACTION' })

@@ -99,4 +99,9 @@ export const getAllTimeSlots = catchAsync(
   },
 );
 
-export default { createNewTimeSlot, editTimeSlot, getAllTimeSlots };
+export default {
+  createNewTimeSlot,
+  editTimeSlot,
+  getAllTimeSlots,
+  getSlotName,
+};

@@ -12,6 +12,7 @@ const createNewZone = catchAsync(
       name,
       deliveryCharges,
     });
+    await newZone.save();
     newZone.pincodes = [];
     newZone.products = [];
     for (const pincode of pincodes) {

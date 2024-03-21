@@ -4,7 +4,7 @@ export const addressValidator = z.object({
   name: z.string(),
   mobile: z.string(),
   alternatePhone: z.string().optional(),
-  pincode: z.string(),
+  pincode: z.string().uuid(),
   locality: z.string(),
   address: z.string(),
   city: z.string(),

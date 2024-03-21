@@ -80,7 +80,7 @@ export class Zone extends BaseEntity {
   @JoinTable({ name: 'zone_pincode' })
   pincodes: Pincode[];
 
-  @ManyToMany(() => Product, { eager: false, onDelete: 'NO ACTION' })
+  @ManyToMany(() => Product, p => p.allowZones)
   @JoinTable()
   products: Product[];
 

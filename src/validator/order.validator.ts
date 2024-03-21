@@ -13,7 +13,7 @@ export const OrderBodyValidator = z.object({
   endingDeliveryTime: z.coerce.date().transform(val => new Date(val)),
   billingAddress: z.object({
     name: z.string(),
-    pincode: z.string(),
+    pincode: z.string().uuid(),
     locality: z.string(),
     address: z.string(),
     city: z.string(),
