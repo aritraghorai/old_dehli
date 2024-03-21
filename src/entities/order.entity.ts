@@ -12,6 +12,7 @@ import {
 } from 'typeorm';
 import { ProductItem } from './product.entity.js';
 import { User } from './user.entiry.js';
+import { TimeSlot } from './timeslot.entity.js';
 
 export enum ORDER_STATUS_ENUM {
   PENDING = 'PENDING',
@@ -62,6 +63,63 @@ export class OrderAddress extends BaseEntity {
   @Column({ type: 'varchar' })
   state: string;
 
+  @Column({ type: 'date' })
+  deliveryDate: Date;
+
+  @ManyToOne(() => TimeSlot, ts => ts.id, { onDelete: 'SET NULL' })
+  timeSlot: TimeSlot;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+}
+
+@Entity()
+export class BillingAddress extends BaseEntity {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column({ type: 'varchar' })
+  name: string;
+
+  @Column({ type: 'varchar' })
+  pincode: string;
+
+  @Column({ type: 'varchar' })
+  locality: string;
+
+  @Column({ type: 'varchar' })
+  address: string;
+
+  @Column({ type: 'varchar' })
+  city: string;
+
+  @Column({ type: 'varchar' })
+  landmark: string;
+
+  @Column({ type: 'varchar' })
+  state: string;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+}
+
+@Entity()
+export class RazorpayPayment extends BaseEntity {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column({ type: 'varchar' })
+  orderId: string;
+
+  @Column({ type: 'varchar' })
+  paymentId: string;
+
   @CreateDateColumn()
   createdAt: Date;
 
@@ -100,14 +158,25 @@ export class Order extends BaseEntity {
   @JoinColumn({ name: 'order_address_id' })
   orderAddress: OrderAddress;
 
+  @OneToOne(() => BillingAddress, {
+    onDelete: 'CASCADE',
+    eager: true,
+  })
+  @JoinColumn({ name: 'billing_address_id' })
+  billingAddress: BillingAddress;
+
+  @OneToOne(() => RazorpayPayment, {
+    onDelete: 'CASCADE',
+    eager: true,
+  })
+  @JoinColumn({ name: 'razorpay_payment_id' })
+  razorpayPayment: RazorpayPayment;
+
   @Column({
     type: 'varchar',
     enum: ORDER_STATUS_ENUM,
   })
   status: string;
-
-  @Column({ type: 'varchar', nullable: true })
-  paymentId: string;
 
   @Column({ type: 'varchar', nullable: true })
   orderId: string;

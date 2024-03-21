@@ -14,6 +14,8 @@ import {
 } from 'typeorm';
 import { Image } from './image.entity.js';
 import { Category } from './category.entity.js';
+import { Zone } from './address.entity.js';
+import { TimeSlot } from './timeslot.entity.js';
 
 @Entity()
 export class ProductTag extends BaseEntity {
@@ -124,7 +126,7 @@ export class ProductType extends BaseEntity {
   @Column({ nullable: true, type: 'text' })
   description: string;
 
-  @ManyToOne(() => Image, { eager: true, onDelete: 'NO ACTION' })
+  @ManyToOne(() => Image, { eager: true, onDelete: 'SET NULL' })
   @JoinColumn({ name: 'imageId' })
   image: Image;
 
@@ -183,6 +185,16 @@ export class Product extends BaseEntity {
   @JoinColumn({ name: 'productTypeId' })
   type: ProductType;
 
+  @ManyToOne(() => TimeSlot, ts => ts.id, { eager: true, onDelete: 'SET NULL' })
+  timeSlot: TimeSlot;
+
+  @Column({ type: 'numeric', default: 1 })
+  minOrderQuantity: number;
+
+  @ManyToMany(() => Zone, { eager: true, onDelete: 'NO ACTION' })
+  @JoinTable()
+  allowZones: Zone[];
+
   @ManyToOne(() => Category, c => c.id, { eager: false, onDelete: 'NO ACTION' })
   @JoinColumn({ name: 'categoryId' })
   category: Category;
@@ -214,6 +226,9 @@ export class ProductItem extends BaseEntity {
 
   @Column({ type: 'float' })
   price: number;
+
+  @Column({ type: 'float' })
+  weight: number;
 
   @OneToMany(() => ProductCofiguration, pc => pc.productItem, {
     eager: true,

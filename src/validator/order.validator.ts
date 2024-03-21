@@ -8,6 +8,18 @@ export const OrderBodyValidator = z.object({
     PAYMENT_GATEWAY.CASH_ON_DELIVERY,
     PAYMENT_GATEWAY.RAZORPAY,
   ]),
+  deliveryDate: z.coerce.date().transform(val => new Date(val)),
+  startingDeliveryTime: z.coerce.date().transform(val => new Date(val)),
+  endingDeliveryTime: z.coerce.date().transform(val => new Date(val)),
+  billingAddress: z.object({
+    name: z.string(),
+    pincode: z.string(),
+    locality: z.string(),
+    address: z.string(),
+    city: z.string(),
+    landmark: z.string(),
+    state: z.string(),
+  }),
 });
 
 export const UpdateOrderBodyValidator = z.object({

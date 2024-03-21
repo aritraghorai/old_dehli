@@ -1,7 +1,6 @@
 import { User, UserProfile } from '@/entities/user.entiry.js';
 import AppError from '@/utils/AppError.js';
 import catchAsync from '@/utils/catchAsync.js';
-import { UpdateProductRequestBody } from '@/validator/product.validator.js';
 import { NewProfile, UpdateProfile } from '@/validator/profile.validator.js';
 import { Request, Response } from 'express';
 import { Not } from 'typeorm';

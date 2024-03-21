@@ -4,7 +4,9 @@ import {
   Product,
   ProductCofiguration,
   ProductItem,
+  ProductType,
 } from '@/entities/product.entity.js';
+import { TimeSlot } from '@/entities/timeslot.entity.js';
 import AppError from '@/utils/AppError.js';
 import { myDataSource } from '@/utils/app-data-source.js';
 import catchAsync from '@/utils/catchAsync.js';
@@ -46,6 +48,9 @@ const getAllProduct = catchAsync(
         category: true,
         shop: true,
         productItems: true,
+        type: true,
+        timeSlot: true,
+        allowZones: true,
       },
     });
     res.status(200).json({
@@ -65,58 +70,19 @@ const getAllProductAdmin = catchAsync(
     res: Response,
     next: NextFunction,
   ) => {
-    const { limit, page, category, search, shop } = req.query;
-    const [products, total] = await Product.findAndCount({
-      skip: (page - 1) * limit,
-      take: limit,
-      where: [
-        {
-          slug: search ? Like(`%${search}%`) : Like(`%%`),
-          category: {
-            slug: category ? Like(`%${category}%`) : Like(`%%`),
-          },
-          shop: {
-            slug: shop ? Like(`%${shop}%`) : Like(`%%`),
-            isActive: true,
-          },
-          isActive: true,
-        },
-        {
-          name: search ? Like(`%${search}%`) : Like(`%%`),
-          category: {
-            slug: category ? Like(`%${category}%`) : Like(`%%`),
-          },
-          shop: {
-            slug: shop ? Like(`%${shop}%`) : Like(`%%`),
-            isActive: true,
-          },
-          isActive: true,
-        },
-        {
-          description: search ? Like(`%${search}%`) : Like(`%%`),
-          category: {
-            slug: category ? Like(`%${category}%`) : Like(`%%`),
-          },
-          shop: {
-            slug: shop ? Like(`%${shop}%`) : Like(`%%`),
-            isActive: true,
-          },
-          isActive: true,
-        },
-      ],
+    const products = await Product.find({
       relations: {
         category: true,
         shop: true,
         productItems: true,
+        type: true,
+        timeSlot: true,
+        allowZones: true,
       },
     });
     res.status(200).json({
       status: true,
       data: products,
-      total,
-      page,
-      limit,
-      totalPage: Math.ceil(total / limit),
     });
   },
 );
@@ -157,9 +123,30 @@ const createProduct = catchAsync(
       shopId,
       categoryId,
       description,
+      productType,
+      timeSlot,
     } = req.body;
     const slug = name.toLowerCase().split(' ').join('-');
     await myDataSource.transaction(async tx => {
+      const productTypeExist = await ProductType.findOne({
+        where: {
+          id: productType,
+        },
+      });
+      if (!productTypeExist) {
+        throw new AppError('Product type not found', 404);
+      }
+
+      const timeSlotExist = await TimeSlot.findOne({
+        where: {
+          id: timeSlot,
+        },
+      });
+
+      if (!timeSlotExist) {
+        throw new AppError('Time slot not found', 404);
+      }
+
       const product = Product.create({
         name,
         price,
@@ -174,6 +161,8 @@ const createProduct = catchAsync(
         productTag: productTags.map((tag: string) => ({
           id: tag,
         })),
+        type: productTypeExist,
+        timeSlot: timeSlotExist,
       });
       await tx.save(product);
       res.status(201).json({
@@ -187,7 +176,14 @@ const createProduct = catchAsync(
 const addNewProductItem = catchAsync(
   async (req: Request<{ id: string }, any, NewProductItem>, res: Response) => {
     const { id } = req.params;
-    const { price, sku, stock, images = [], optionValues = [] } = req.body;
+    const {
+      price,
+      sku,
+      stock,
+      images = [],
+      optionValues = [],
+      weight,
+    } = req.body;
     await myDataSource.transaction(async tx => {
       const prpductRepo = tx.getRepository(Product);
       const product = await prpductRepo.findOneById(id);
@@ -203,6 +199,7 @@ const addNewProductItem = catchAsync(
         price,
         sku,
         stock,
+        weight,
         images: images?.map((image: string) => ({ id: image })),
         product: {
           id,
@@ -251,7 +248,7 @@ const updateProductItem = catchAsync(
     res: Response,
   ) => {
     const { id } = req.params;
-    const { sku, stock, price, optionValues = [] } = req.body;
+    const { sku, stock, price, optionValues = [], weight } = req.body;
     const productItem = await ProductItem.findOne({
       where: {
         id,
@@ -259,17 +256,17 @@ const updateProductItem = catchAsync(
       relations: {
         productConfig: {
           option: true,
-          optionValue: true
-        }
-      }
-    })
+          optionValue: true,
+        },
+      },
+    });
     if (!productItem) {
       throw new AppError('Product item not found', 404);
     }
-    console.log(productItem);
     productItem.sku = sku;
     productItem.stock = stock;
     productItem.price = price;
+    productItem.weight = weight || productItem.weight;
     //check if option value exist or not
     for (const optionValue of optionValues) {
       //check option value exist or not
@@ -327,7 +324,16 @@ const updateProduct = catchAsync(
     res: Response,
   ) => {
     const { id } = req.params;
-    const { name, description, slug, price, isActive, categoryId } = req.body;
+    const {
+      name,
+      description,
+      slug,
+      price,
+      isActive,
+      categoryId,
+      productType,
+      timeSlot
+    } = req.body;
     const product = await Product.findOneById(id);
     if (!product) {
       res.status(404).json({
@@ -356,6 +362,28 @@ const updateProduct = catchAsync(
         });
       }
       product.category = category;
+    }
+    if (productType) {
+      const type = await ProductType.findOne({
+        where: {
+          id: productType,
+        },
+      });
+      if (!type) {
+        throw new AppError('Product type not found', 404);
+      }
+      product.type = type;
+    }
+    if (timeSlot) {
+      const slot = await TimeSlot.findOne({
+        where: {
+          id: timeSlot,
+        },
+      });
+      if (!slot) {
+        throw new AppError('Time slot not found', 404);
+      }
+      product.timeSlot = slot;
     }
     if (isActive !== undefined) product.isActive = isActive;
     await product.save();

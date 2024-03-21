@@ -1,4 +1,3 @@
-import { type } from 'os';
 import { z } from 'zod';
 
 export const productQuerySchema = z.object({
@@ -15,6 +14,8 @@ export const NewProductBodyValidator = z.object({
   categoryId: z.string().uuid(),
   shopId: z.string().uuid(),
   price: z.number().positive(),
+  productType: z.string().uuid(),
+  timeSlot: z.string().uuid(),
 });
 
 export const ProductAndProductTagParamValidator = z.object({
@@ -34,6 +35,10 @@ export const ProductItemValidator = z.object({
     .transform(val => +val),
   images: z.array(z.string().uuid()).optional(),
   optionValues: z.array(z.string().uuid()).optional(),
+  weight: z.coerce
+    .number()
+    .positive()
+    .transform(val => +val),
 });
 
 export const UpdateProductRequestBodyValidator = z.object({
@@ -47,6 +52,8 @@ export const UpdateProductRequestBodyValidator = z.object({
     .transform(val => +val),
   isActive: z.boolean().optional(),
   categoryId: z.string().uuid().optional(),
+  productType: z.string().uuid().optional(),
+  timeSlot: z.string().uuid().optional(),
 });
 
 export const UpdateProductItemValidator = z.object({
@@ -60,6 +67,11 @@ export const UpdateProductItemValidator = z.object({
     .positive()
     .transform(val => +val),
   optionValues: z.array(z.string().uuid()).optional(),
+  weight: z.coerce
+    .number()
+    .positive()
+    .optional()
+    .transform(val => +val),
 });
 
 export type UpdateProductRequestBody = z.infer<

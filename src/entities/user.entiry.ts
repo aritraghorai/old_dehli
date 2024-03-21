@@ -17,6 +17,7 @@ import {
 } from 'typeorm';
 import { ProductItem } from './product.entity.js';
 import { Image } from './image.entity.js';
+import { Address } from './address.entity.js';
 
 @Entity()
 export class Role extends BaseEntity {
@@ -96,6 +97,29 @@ export class User extends BaseEntity {
   @ManyToMany(() => Role, { eager: true, onDelete: 'NO ACTION' })
   @JoinTable()
   role: Role[];
+}
+
+@Entity()
+export class UserAddress extends BaseEntity {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column({ type: 'boolean', default: false })
+  isDefault: boolean;
+
+  @ManyToOne(() => Address, a => a.id, { eager: true })
+  @JoinColumn({ name: 'address_id' })
+  address: Address;
+
+  @ManyToOne(() => User, u => u.id)
+  @JoinColumn({ name: 'user_id' })
+  user: User;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }
 
 @Entity()

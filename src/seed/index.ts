@@ -168,6 +168,7 @@ await myDataSource.transaction(async manager => {
         productItem.stock = Math.floor(Math.random() * 100);
         productItem.price = Math.floor(Math.random() * 1000000);
         productItem.sku = faker.random.alphaNumeric(10);
+        productItem.weight = Math.floor(Math.random() * 100);
         productItem.images = [];
         productItem.images.push(faker.helpers.arrayElement(images));
         await productItem.save();
@@ -182,6 +183,7 @@ await myDataSource.transaction(async manager => {
       productItem.product = products[i];
       productItem.stock = Math.floor(Math.random() * 100);
       productItem.price = Math.floor(Math.random() * 1000000);
+      productItem.weight = Math.floor(Math.random() * 100);
       productItem.sku = faker.random.alphaNumeric(10);
       productItem.images = [];
       productItem.images.push(faker.helpers.arrayElement(images));

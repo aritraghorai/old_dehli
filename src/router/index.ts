@@ -12,6 +12,9 @@ import productOptionRoute from './productOption.routes.js';
 import userRouter from './user.routes.js';
 import favoriteRouter from './favorite.rotes.js';
 import productTypeRouter from './productType.rotes.js';
+import pincodeRouter from './pincode.router.js';
+import zoneRouter from './zones.routes.js';
+import timeSlotRouter from './timeslot.routes.js';
 
 const router = Router();
 
@@ -28,5 +31,8 @@ router.use('/product-tag', productTagRouter);
 router.use('/product-option', productOptionRoute);
 router.use('/product-type', productTypeRouter);
 router.use('/user', userRouter);
+router.use('/pin-code', pincodeRouter);
+router.use('/zones', zoneRouter);
+router.use('/timeslot', timeSlotRouter);
 
 export default router;

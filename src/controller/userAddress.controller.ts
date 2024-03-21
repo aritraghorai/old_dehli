@@ -1,5 +1,5 @@
-import { Address, UserAddress } from '@/entities/address.entity.js';
-import { User } from '@/entities/user.entiry.js';
+import { Address } from '@/entities/address.entity.js';
+import { User, UserAddress } from '@/entities/user.entiry.js';
 import { myDataSource } from '@/utils/app-data-source.js';
 import catchAsync from '@/utils/catchAsync.js';
 import { addressType } from '@/validator/address.validator.js';
