@@ -12,7 +12,6 @@ import {
 } from 'typeorm';
 import { ProductItem } from './product.entity.js';
 import { User } from './user.entiry.js';
-import { TimeSlot } from './timeslot.entity.js';
 import { Pincode } from './address.entity.js';
 
 export enum ORDER_STATUS_ENUM {
@@ -67,8 +66,11 @@ export class OrderAddress extends BaseEntity {
   @Column({ type: 'date' })
   deliveryDate: Date;
 
-  @ManyToOne(() => TimeSlot, ts => ts.id, { onDelete: 'SET NULL' })
-  timeSlot: TimeSlot;
+  @Column({ type: 'time' })
+  startTime: Date;
+
+  @Column({ type: 'time' })
+  endTime: Date;
 
   @CreateDateColumn()
   createdAt: Date;

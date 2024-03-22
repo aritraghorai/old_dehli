@@ -3,8 +3,14 @@ import orderController from '@/controller/orderController.js';
 import ValidateRequestNew from '@/middleware/ValidateRequestNew.js';
 import restrictUser from '@/middleware/restrictUser.middleware.js';
 import { ROLES } from '@/utils/Constant.js';
-import { praramIdValidator, queryPageValidator } from '@/validator/common.validator.js';
-import { OrderBodyValidator, UpdateOrderBodyValidator } from '@/validator/order.validator.js';
+import {
+  praramIdValidator,
+  queryPageValidator,
+} from '@/validator/common.validator.js';
+import {
+  OrderBodyValidator,
+  UpdateOrderBodyValidator,
+} from '@/validator/order.validator.js';
 import { Router } from 'express';
 
 const orderRouter = Router();
@@ -12,10 +18,20 @@ const orderRouter = Router();
 orderRouter.use(extractUser);
 
 orderRouter.post(
+  '/checkout-details',
+  ValidateRequestNew({
+    reqBodySchema: OrderBodyValidator,
+  }),
+  orderController.checkDeliveryPossibleOrNot,
+  orderController.getCheckOutDetails,
+);
+
+orderRouter.post(
   '/',
   ValidateRequestNew({
     reqBodySchema: OrderBodyValidator,
   }),
+  orderController.checkDeliveryPossibleOrNot,
   orderController.createOrder,
 );
 orderRouter.get(
@@ -32,7 +48,7 @@ orderRouter.patch(
   '/:id',
   ValidateRequestNew({
     reqBodySchema: UpdateOrderBodyValidator,
-    paramSchema: praramIdValidator
+    paramSchema: praramIdValidator,
   }),
   orderController.updateOrder,
 );

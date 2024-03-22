@@ -1,4 +1,4 @@
-import { Address } from '@/entities/address.entity.js';
+import { Address, Zone } from '@/entities/address.entity.js';
 import {
   ORDER_STATUS_ENUM,
   Order,
@@ -17,9 +17,136 @@ import { myDataSource } from '@/utils/app-data-source.js';
 import catchAsync from '@/utils/catchAsync.js';
 import { QueryPageType } from '@/validator/common.validator.js';
 import { OrderBody, UpdateOrderBody } from '@/validator/order.validator.js';
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import timeslotController from './timeslot.controller.js';
-import { In } from 'typeorm';
+
+declare module 'express' {
+  interface Request {
+    deliveryCharge?: number;
+  }
+}
+
+const getCheckOutDetails = catchAsync(
+  async (req: Request<any, any, OrderBody>, res: Response) => {
+    const deliveryCharge = req.deliveryCharge;
+    return res.status(200).json({
+      status: true,
+      data: {
+        deliveryCharge,
+      },
+    });
+  },
+);
+
+const checkDeliveryPossibleOrNot = catchAsync(
+  async (
+    req: Request<any, any, OrderBody>,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    const user = req.user as User;
+    await myDataSource.transaction(async trx => {
+      const addressRepo = trx.getRepository(Address);
+      const { addressId } = req.body;
+      const address = await addressRepo.findOne({
+        where: { id: addressId },
+      });
+      if (!address) {
+        throw new AppError('Address not found', 404);
+      }
+
+      //user has item in the card
+      const userCardRepo = trx.getRepository(UserCart);
+
+      const userCart = await userCardRepo.findOne({
+        where: {
+          user: { id: user.id },
+        },
+      });
+
+      const deliverPossibleItem = await userCardRepo.findOne({
+        where: {
+          user: { id: user.id },
+          cardItems: {
+            productItem: {
+              product: {
+                allowZones: [
+                  {
+                    pincodes: {
+                      id: address.pincode.id,
+                    },
+                  },
+                  {
+                    name: 'All India',
+                  },
+                ],
+              },
+            },
+          },
+        },
+        relations: {
+          cardItems: {
+            productItem: {
+              product: {
+                allowZones: {
+                  pincodes: true,
+                },
+              },
+            },
+          },
+        },
+      });
+      if (!userCart || !userCart.cardItems.length) {
+        throw new AppError('No item in the cart', 400);
+      }
+
+      const notDeliverableItems = userCart.cardItems.filter(
+        item =>
+          !deliverPossibleItem.cardItems.find(
+            i => i.productItem.id === item.productItem.id,
+          ),
+      );
+      // if some thing is not deliverable
+      if (notDeliverableItems.length) {
+        return res.status(400).json({
+          status: false,
+          message: 'Some items are not deliverable',
+          data: notDeliverableItems,
+        });
+      }
+
+      const zoneRepo = trx.getRepository(Zone);
+
+      let deliveryCharge = 0;
+
+      let zone = await zoneRepo.findOne({
+        where: {
+          pincodes: {
+            id: address.pincode.id,
+          },
+        },
+      });
+      if (zone) {
+        deliveryCharge = zone.deliveryCharges;
+      } else {
+        zone = await zoneRepo.findOne({
+          where: {
+            name: 'All India',
+          },
+        });
+        //calculate delivery charge by weight
+        for (const item of userCart.cardItems) {
+          deliveryCharge +=
+            item.productItem.weight * zone.deliveryCharges ?? 10 * item.count;
+        }
+      }
+
+      req.deliveryCharge = deliveryCharge;
+
+      next();
+    });
+  },
+);
 
 const createOrder = catchAsync(
   async (req: Request<any, any, OrderBody>, res: Response) => {
@@ -85,6 +212,49 @@ const createOrder = catchAsync(
       if (!userCart || !userCart.cardItems.length) {
         throw new AppError('No item in the cart', 400);
       }
+
+      // if some thing is not deliverable
+      for (const item of userCart.cardItems) {
+        if (
+          !deliverPossibleItem.cardItems.find(
+            i => i.productItem.id === item.productItem.id,
+          )
+        ) {
+          throw new AppError(
+            `Item ${item.productItem.product.name} is not deliverable to this address`,
+            400,
+          );
+        }
+      }
+
+      const zoneRepo = trx.getRepository(Zone);
+
+      let deliveryCharge = 0;
+
+      let zone = await zoneRepo.findOne({
+        where: {
+          pincodes: {
+            id: address.pincode.id,
+          },
+        },
+      });
+      if (zone) {
+        deliveryCharge = zone.deliveryCharges;
+      } else {
+        zone = await zoneRepo.findOne({
+          where: {
+            name: 'All India',
+          },
+        });
+        //calculate delivery charge by weight
+        for (const item of userCart.cardItems) {
+          deliveryCharge +=
+            item.productItem.weight * zone.deliveryCharges ?? 10 * item.count;
+        }
+      }
+
+      // calculate delivery charge
+
       // check stock
       //      const orderAddressRepo = trx.getRepository(OrderAddress);
       //      // create time slot
@@ -200,6 +370,7 @@ const createOrder = catchAsync(
       return res.status(201).json({
         deliverPossibleItem,
         userCart,
+        deliveryCharge,
       });
     });
   },
@@ -266,4 +437,11 @@ const updateOrder = catchAsync(
   },
 );
 
-export default { createOrder, getOrders, getAllOrdersAdmin, updateOrder };
+export default {
+  createOrder,
+  getOrders,
+  getAllOrdersAdmin,
+  updateOrder,
+  getCheckOutDetails,
+  checkDeliveryPossibleOrNot,
+};
