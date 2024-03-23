@@ -16,6 +16,10 @@ export const NewProductBodyValidator = z.object({
   price: z.number().positive(),
   productType: z.string().uuid(),
   timeSlot: z.string().uuid(),
+  minOrderQuantity: z.coerce
+    .number()
+    .positive()
+    .transform(val => +val),
 });
 
 export const ProductAndProductTagParamValidator = z.object({
@@ -54,6 +58,11 @@ export const UpdateProductRequestBodyValidator = z.object({
   categoryId: z.string().uuid().optional(),
   productType: z.string().uuid().optional(),
   timeSlot: z.string().uuid().optional(),
+  minOrderQuantity: z.coerce
+    .number()
+    .positive()
+    .optional()
+    .transform(val => +val),
 });
 
 export const UpdateProductItemValidator = z.object({

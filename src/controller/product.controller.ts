@@ -125,6 +125,7 @@ const createProduct = catchAsync(
       description,
       productType,
       timeSlot,
+      minOrderQuantity,
     } = req.body;
     const slug = name.toLowerCase().split(' ').join('-');
     await myDataSource.transaction(async tx => {
@@ -163,6 +164,7 @@ const createProduct = catchAsync(
         })),
         type: productTypeExist,
         timeSlot: timeSlotExist,
+        minOrderQuantity,
       });
       await tx.save(product);
       res.status(201).json({
@@ -332,7 +334,8 @@ const updateProduct = catchAsync(
       isActive,
       categoryId,
       productType,
-      timeSlot
+      timeSlot,
+      minOrderQuantity,
     } = req.body;
     const product = await Product.findOneById(id);
     if (!product) {
@@ -384,6 +387,9 @@ const updateProduct = catchAsync(
         throw new AppError('Time slot not found', 404);
       }
       product.timeSlot = slot;
+    }
+    if (minOrderQuantity) {
+      product.minOrderQuantity = minOrderQuantity;
     }
     if (isActive !== undefined) product.isActive = isActive;
     await product.save();
