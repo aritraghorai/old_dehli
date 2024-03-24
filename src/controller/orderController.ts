@@ -1,22 +1,31 @@
-import { Address, Zone } from '@/entities/address.entity.js';
+import { Address, Pincode, Zone } from '@/entities/address.entity.js';
 import {
+  BillingAddress,
   ORDER_STATUS_ENUM,
   Order,
   OrderAddress,
   OrderItem,
   PAYMENT_GATEWAY,
   PAYMENT_STATUS,
+  RazorpayPayment,
 } from '@/entities/order.entity.js';
 import { ProductItem } from '@/entities/product.entity.js';
 import { TimeSlot } from '@/entities/timeslot.entity.js';
 import { CartItem, User, UserCart } from '@/entities/user.entiry.js';
-import { createOrderRazerPay } from '@/services/payment/razorpay.service.js';
+import {
+  createOrderRazerPay,
+  validateSignature,
+} from '@/services/payment/razorpay.service.js';
 import whatshapp from '@/services/whatshapp/index.js';
 import AppError from '@/utils/AppError.js';
 import { myDataSource } from '@/utils/app-data-source.js';
 import catchAsync from '@/utils/catchAsync.js';
 import { QueryPageType } from '@/validator/common.validator.js';
-import { OrderBody, UpdateOrderBody } from '@/validator/order.validator.js';
+import {
+  OrderBody,
+  UpdateOrderBody,
+  payemntSuccessBodyType,
+} from '@/validator/order.validator.js';
 import { NextFunction, Request, Response } from 'express';
 import timeslotController from './timeslot.controller.js';
 
@@ -62,6 +71,17 @@ const checkDeliveryPossibleOrNot = catchAsync(
         where: {
           user: { id: user.id },
         },
+        relations: {
+          cardItems: {
+            productItem: {
+              product: {
+                allowZones: {
+                  pincodes: true,
+                },
+              },
+            },
+          },
+        },
       });
 
       const deliverPossibleItem = await userCardRepo.findOne({
@@ -96,13 +116,23 @@ const checkDeliveryPossibleOrNot = catchAsync(
           },
         },
       });
+
+      console.log(userCart, deliverPossibleItem);
       if (!userCart || !userCart.cardItems.length) {
         throw new AppError('No item in the cart', 400);
       }
 
+      if (!deliverPossibleItem?.cardItems) {
+        return res.status(400).json({
+          status: false,
+          message: 'No item is deliverable',
+          data: userCart.cardItems,
+        });
+      }
+
       const notDeliverableItems = userCart.cardItems.filter(
         item =>
-          !deliverPossibleItem.cardItems.find(
+          !deliverPossibleItem?.cardItems.find(
             i => i.productItem.id === item.productItem.id,
           ),
       );
@@ -175,28 +205,6 @@ const createOrder = catchAsync(
         where: {
           user: { id: user.id },
         },
-      });
-
-      const deliverPossibleItem = await userCardRepo.findOne({
-        where: {
-          user: { id: user.id },
-          cardItems: {
-            productItem: {
-              product: {
-                allowZones: [
-                  {
-                    pincodes: {
-                      id: address.pincode.id,
-                    },
-                  },
-                  {
-                    name: 'All India',
-                  },
-                ],
-              },
-            },
-          },
-        },
         relations: {
           cardItems: {
             productItem: {
@@ -209,168 +217,146 @@ const createOrder = catchAsync(
           },
         },
       });
+
       if (!userCart || !userCart.cardItems.length) {
         throw new AppError('No item in the cart', 400);
       }
 
-      // if some thing is not deliverable
-      for (const item of userCart.cardItems) {
-        if (
-          !deliverPossibleItem.cardItems.find(
-            i => i.productItem.id === item.productItem.id,
-          )
-        ) {
-          throw new AppError(
-            `Item ${item.productItem.product.name} is not deliverable to this address`,
-            400,
-          );
-        }
-      }
+      // create billing address
+      const billingAddressRepo = trx.getRepository(BillingAddress);
 
-      const zoneRepo = trx.getRepository(Zone);
+      const pincodeRepo = trx.getRepository(Pincode);
 
-      let deliveryCharge = 0;
-
-      let zone = await zoneRepo.findOne({
-        where: {
-          pincodes: {
-            id: address.pincode.id,
-          },
-        },
+      const pincode = await pincodeRepo.findOne({
+        where: { id: billingAddress.pincode },
       });
-      if (zone) {
-        deliveryCharge = zone.deliveryCharges;
-      } else {
-        zone = await zoneRepo.findOne({
-          where: {
-            name: 'All India',
-          },
-        });
-        //calculate delivery charge by weight
-        for (const item of userCart.cardItems) {
-          deliveryCharge +=
-            item.productItem.weight * zone.deliveryCharges ?? 10 * item.count;
-        }
+
+      if (!pincode) {
+        throw new AppError('Billing address Pincode not found', 404);
       }
 
-      // calculate delivery charge
+      const newBillingAddress = billingAddressRepo.create({
+        name: billingAddress.name,
+        pincode: pincode,
+        locality: billingAddress.locality,
+        address: billingAddress.address,
+        landmark: billingAddress.landmark,
+        city: billingAddress.city,
+      });
 
       // check stock
-      //      const orderAddressRepo = trx.getRepository(OrderAddress);
-      //      // create time slot
-      //      const timeSlotRepo = trx.getRepository(TimeSlot);
-      //
-      //      startingDeliveryTime.setMinutes(0);
-      //      startingDeliveryTime.setSeconds(0);
-      //      endingDeliveryTime.setMinutes(0);
-      //      endingDeliveryTime.setSeconds(0);
-      //
-      //      const timeSlot = timeSlotRepo.create({
-      //        startTime: startingDeliveryTime,
-      //        endTime: endingDeliveryTime,
-      //        slot: timeslotController.getSlotName(
-      //          startingDeliveryTime,
-      //          endingDeliveryTime,
-      //        ),
-      //      });
-      //
-      //      await timeSlotRepo.save(timeSlot);
-      //
-      //      // create order address
-      //      const newOrderAddress = orderAddressRepo.create({
-      //        name: address.name,
-      //        mobile: address.mobile,
-      //        alternatePhone: address.alternatePhone,
-      //        pincode: address.pincode,
-      //        locality: address.locality,
-      //        address: address.address,
-      //        city: address.city,
-      //        id: undefined,
-      //        timeSlot,
-      //        deliveryDate: deliveryDate,
-      //      });
-      //      await orderAddressRepo.save(newOrderAddress);
-      //
-      //      // create billing address
-      //
-      //      //calculate total amount
-      //      const totalAmount = userCart.cardItems.reduce((acc, item) => {
-      //        return acc + item.productItem.price * item.count;
-      //      }, 0);
-      //      // create order items
-      //      const orderRepo = trx.getRepository(Order);
-      //      const newOrder = orderRepo.create({
-      //        user: user,
-      //        paymentGateway:
-      //          req.body.paymentMethod === PAYMENT_GATEWAY.CASH_ON_DELIVERY
-      //            ? PAYMENT_GATEWAY.CASH_ON_DELIVERY
-      //            : PAYMENT_GATEWAY.RAZORPAY,
-      //        status: ORDER_STATUS_ENUM.PENDING,
-      //        paymentStatus: PAYMENT_STATUS.PENDING,
-      //        orderAddress: newOrderAddress,
-      //        grandTotal: totalAmount,
-      //      });
-      //      await orderRepo.save(newOrder);
-      //      // create order items
-      //      const orderItemRepo = trx.getRepository(OrderItem);
-      //      const newOrderItems = orderItemRepo.create(
-      //        userCart.cardItems.map(item => ({
-      //          order: newOrder,
-      //          productItem: item.productItem,
-      //          price: item.productItem.price,
-      //          quantity: item.count,
-      //        })),
-      //      );
-      //      await orderItemRepo.save(newOrderItems);
-      //      // update productitem stock
-      //      const productItemRepo = trx.getRepository(ProductItem);
-      //      for (const item of userCart.cardItems) {
-      //        await productItemRepo.update(
-      //          { id: item.productItem.id },
-      //          { stock: item.productItem.stock - item.count },
-      //        );
-      //      }
-      //      // delete user cart
-      //      const userCardItemRepo = trx.getRepository(CartItem);
-      //      await userCardItemRepo.delete({ cart: userCart });
-      //      if (req.body.paymentMethod === PAYMENT_GATEWAY.CASH_ON_DELIVERY) {
-      //        // send sms
-      //        // send email
-      //        // send notification
-      //        await whatshapp.sendMessage(
-      //          `${user.name}, your order has been placed successfully.
-      // Your order id is ${newOrder.id} and total amount is ${newOrder.grandTotal}.
-      // Our delivery executive will contact you soon. Thank you for shopping with us.`,
-      //          user.phoneNumber,
-      //        );
-      //        return res.status(201).json({
-      //          status: true,
-      //          message: 'Order created successfully',
-      //          data: newOrder,
-      //        });
-      //      }
-      //      // razorpay payment
-      //      // create razorpay order
-      //      // create razorpay payment
-      //      const razorpayOrder = await createOrderRazerPay(totalAmount, user.name, {
-      //        orderId: newOrder.id,
-      //        userId: user.id,
-      //      });
-      //      //update order with razorpay order id
-      //      newOrder.orderId = razorpayOrder.id;
-      //      await orderRepo.save(newOrder);
-      //      return res.status(201).json({
-      //        status: true,
-      //        message: 'Order created successfully',
-      //        data: {
-      //          order: newOrder,
-      //          razorpayOrder,
-      //        },
-      //      });
+      const orderAddressRepo = trx.getRepository(OrderAddress);
+      // create time slot
+
+      startingDeliveryTime.setMinutes(0);
+      startingDeliveryTime.setSeconds(0);
+      endingDeliveryTime.setMinutes(0);
+      endingDeliveryTime.setSeconds(0);
+
+      // create order address
+      const newOrderAddress = orderAddressRepo.create({
+        name: address.name,
+        mobile: address.mobile,
+        alternatePhone: address.alternatePhone,
+        pincode: address.pincode,
+        locality: address.locality,
+        address: address.address,
+        landmark: address.landmark,
+        city: address.city,
+        state: address.state,
+        id: undefined,
+        deliveryDate: deliveryDate,
+        startTime: startingDeliveryTime,
+        endTime: endingDeliveryTime,
+      });
+      await orderAddressRepo.save(newOrderAddress);
+
+      //calculate total amount
+      const totalAmount =
+        userCart.cardItems.reduce((acc, item) => {
+          return acc + item.productItem.price * item.count;
+        }, 0) + req.deliveryCharge;
+      // create order items
+      const orderRepo = trx.getRepository(Order);
+      const newOrder = orderRepo.create({
+        user: user,
+        paymentGateway:
+          req.body.paymentMethod === PAYMENT_GATEWAY.CASH_ON_DELIVERY
+            ? PAYMENT_GATEWAY.CASH_ON_DELIVERY
+            : PAYMENT_GATEWAY.RAZORPAY,
+        status: ORDER_STATUS_ENUM.PENDING,
+        paymentStatus: PAYMENT_STATUS.PENDING,
+        orderAddress: newOrderAddress,
+        grandTotal: totalAmount,
+        deliveryCharge: req.deliveryCharge,
+        billingAddress: newBillingAddress,
+      });
+      await orderRepo.save(newOrder);
+      // create order items
+      const orderItemRepo = trx.getRepository(OrderItem);
+      const newOrderItems = orderItemRepo.create(
+        userCart.cardItems.map(item => ({
+          order: newOrder,
+          productItem: item.productItem,
+          price: item.productItem.price,
+          quantity: item.count,
+        })),
+      );
+      await orderItemRepo.save(newOrderItems);
+      // update productitem stock
+      const productItemRepo = trx.getRepository(ProductItem);
+      for (const item of userCart.cardItems) {
+        await productItemRepo.update(
+          { id: item.productItem.id },
+          { stock: item.productItem.stock - item.count },
+        );
+      }
+      // delete user cart
+      const userCardItemRepo = trx.getRepository(CartItem);
+      await userCardItemRepo.delete({ cart: userCart });
+      if (req.body.paymentMethod === PAYMENT_GATEWAY.CASH_ON_DELIVERY) {
+        // send sms
+        // send email
+        // send notification
+        await whatshapp.sendMessage(
+          `${user.name}, your order has been placed successfully.
+      Your order id is ${newOrder.id} and total amount is ${newOrder.grandTotal}.
+      Our delivery executive will contact you soon. Thank you for shopping with us.`,
+          user.phoneNumber,
+        );
+        return res.status(201).json({
+          status: true,
+          message: 'Order created successfully',
+          data: newOrder,
+        });
+      }
+
+      const razorpayRepo = trx.getRepository(RazorpayPayment);
+      // razorpay payment
+      // create razorpay order
+      // create razorpay payment
+      const razorpayOrder = await createOrderRazerPay(totalAmount, user.name, {
+        orderId: newOrder.id,
+        userId: user.id,
+      });
+      //update order with razorpay order id
+      newOrder.orderId = razorpayOrder.id;
+
+      const razorpayPayment = razorpayRepo.create({
+        orderId: razorpayOrder.id,
+      });
+      await razorpayRepo.save(razorpayPayment);
+
+      newOrder.razorpayPayment = razorpayPayment;
+
+      await orderRepo.save(newOrder);
       return res.status(201).json({
-        deliverPossibleItem,
-        userCart,
-        deliveryCharge,
+        status: true,
+        message: 'Order created successfully',
+        data: {
+          order: newOrder,
+          razorpayOrder,
+        },
       });
     });
   },
@@ -437,6 +423,67 @@ const updateOrder = catchAsync(
   },
 );
 
+const makeOrderPaymentSuccess = catchAsync(
+  async (
+    req: Request<{ id: string }, any, any, payemntSuccessBodyType>,
+    res: Response,
+  ) => {
+    const { id } = req.params;
+    const { razorpay_order_id, razorpay_signature, razorpay_payment_id } =
+      req.body;
+
+    const orderRepo = myDataSource.getRepository(Order);
+
+    const order = await orderRepo.findOne({
+      where: { id },
+      relations: {
+        razorpayPayment: true,
+      },
+    });
+
+    if (!order) {
+      throw new AppError('Order not found', 404);
+    }
+
+    if (
+      !validateSignature(
+        razorpay_order_id,
+        razorpay_payment_id,
+        razorpay_signature,
+      )
+    ) {
+      throw new AppError('Invalid signature', 400);
+    }
+
+    if (order.paymentStatus === PAYMENT_STATUS.SUCCESS) {
+      throw new AppError('Payment already done', 400);
+    }
+
+    const razorpayRepo = myDataSource.getRepository(RazorpayPayment);
+
+    const razorpayPayment = await razorpayRepo.findOne({
+      where: { id: order.razorpayPayment.id },
+    });
+
+    if (!razorpayPayment) {
+      throw new AppError('Razorpay payment not found', 404);
+    }
+
+    razorpayPayment.paymentId = razorpay_payment_id;
+    await razorpayRepo.save(razorpayPayment);
+
+    order.paymentStatus = PAYMENT_STATUS.SUCCESS;
+
+    await orderRepo.save(order);
+
+    return res.status(200).json({
+      status: true,
+      message: 'Payment success',
+      data: order,
+    });
+  },
+);
+
 export default {
   createOrder,
   getOrders,
@@ -444,4 +491,5 @@ export default {
   updateOrder,
   getCheckOutDetails,
   checkDeliveryPossibleOrNot,
+  makeOrderPaymentSuccess,
 };

@@ -120,7 +120,7 @@ export class RazorpayPayment extends BaseEntity {
   @Column({ type: 'varchar' })
   orderId: string;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', nullable: true })
   paymentId: string;
 
   @CreateDateColumn()
@@ -189,6 +189,9 @@ export class Order extends BaseEntity {
 
   @Column({ type: 'varchar', enum: PAYMENT_STATUS })
   paymentStatus: string;
+
+  @Column({ type: 'float' })
+  deliveryCharge: number;
 
   @CreateDateColumn()
   createdAt: Date;

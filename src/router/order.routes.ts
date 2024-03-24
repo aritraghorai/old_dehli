@@ -10,6 +10,7 @@ import {
 import {
   OrderBodyValidator,
   UpdateOrderBodyValidator,
+  payemntSuccessBodyValidator,
 } from '@/validator/order.validator.js';
 import { Router } from 'express';
 
@@ -24,6 +25,15 @@ orderRouter.post(
   }),
   orderController.checkDeliveryPossibleOrNot,
   orderController.getCheckOutDetails,
+);
+
+orderRouter.post(
+  '/paymentSuccess',
+  ValidateRequestNew({
+    paramSchema: praramIdValidator,
+    reqBodySchema: payemntSuccessBodyValidator,
+  }),
+  orderController.makeOrderPaymentSuccess,
 );
 
 orderRouter.post(

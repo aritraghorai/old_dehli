@@ -39,3 +39,12 @@ export const UpdateOrderBodyValidator = z.object({
 export type UpdateOrderBody = z.infer<typeof UpdateOrderBodyValidator>;
 
 export type OrderBody = z.infer<typeof OrderBodyValidator>;
+
+export const payemntSuccessBodyValidator = z.object({
+  razorpay_payment_id: z.string(),
+  razorpay_signature: z.string(),
+  razorpay_order_id: z.string(),
+});
+export type payemntSuccessBodyType = z.infer<
+  typeof payemntSuccessBodyValidator
+>;
