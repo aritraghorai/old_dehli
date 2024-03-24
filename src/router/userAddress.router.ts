@@ -1,7 +1,10 @@
 import extractUser from '@/controller/extractUser.js';
 import userAddressController from '@/controller/userAddress.controller.js';
 import ValidateRequestNew from '@/middleware/ValidateRequestNew.js';
-import { addressValidator } from '@/validator/address.validator.js';
+import {
+  addressValidator,
+  updateAddressValidator,
+} from '@/validator/address.validator.js';
 import { praramIdValidator } from '@/validator/common.validator.js';
 import { Router } from 'express';
 
@@ -25,5 +28,18 @@ userAddressRouter.get(
   }),
   userAddressController.setDefaultAddress,
 );
+userAddressRouter
+  .route('/:id')
+  .delete(
+    ValidateRequestNew({ paramSchema: praramIdValidator }),
+    userAddressController.deleteAddress,
+  )
+  .put(
+    ValidateRequestNew({
+      reqBodySchema: updateAddressValidator,
+      paramSchema: praramIdValidator,
+    }),
+    userAddressController.updateAddress,
+  );
 
 export default userAddressRouter;
