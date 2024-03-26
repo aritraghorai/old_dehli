@@ -27,6 +27,8 @@ const createNewTimeSlot = catchAsync(
     endTime.setSeconds(0);
     endTime.setMinutes(0);
 
+    console.log(startTime.getHours(), endTime.getHours());
+
     if (startTime.getHours() >= endTime.getHours()) {
       throw new AppError('Start Hour Must be less than End Hour', 400);
     }

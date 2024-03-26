@@ -28,7 +28,7 @@ orderRouter.post(
 );
 
 orderRouter.post(
-  '/paymentSuccess',
+  '/paymentSuccess/:id',
   ValidateRequestNew({
     paramSchema: praramIdValidator,
     reqBodySchema: payemntSuccessBodyValidator,
