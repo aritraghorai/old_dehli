@@ -25,6 +25,8 @@ import bcryptService from './services/bcrypt.service.js';
 
 const app = express();
 
+process.env.TZ = 'Asia/Calcutta';
+
 app.use(morgan('dev'));
 
 app.use(cors());
