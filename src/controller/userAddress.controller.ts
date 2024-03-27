@@ -151,6 +151,7 @@ const updateAddress = catchAsync(
       if (city) address.address.city = city;
       if (landmark) address.address.landmark = landmark;
       if (state) address.address.state = state;
+      await manager.save(address.address);
       await manager.save(address);
       res.status(200).json({
         status: true,
