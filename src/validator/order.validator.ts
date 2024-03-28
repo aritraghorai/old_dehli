@@ -22,6 +22,12 @@ export const OrderBodyValidator = z.object({
   }),
 });
 
+export const CheckOutValidator = z.object({
+  addressId: z.string().uuid(),
+});
+
+export type CheckOutBody = z.infer<typeof CheckOutValidator>;
+
 export const UpdateOrderBodyValidator = z.object({
   status: z
     .enum([

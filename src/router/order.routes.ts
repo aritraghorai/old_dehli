@@ -8,6 +8,7 @@ import {
   queryPageValidator,
 } from '@/validator/common.validator.js';
 import {
+  CheckOutValidator,
   OrderBodyValidator,
   UpdateOrderBodyValidator,
   payemntSuccessBodyValidator,
@@ -21,7 +22,7 @@ orderRouter.use(extractUser);
 orderRouter.post(
   '/checkout-details',
   ValidateRequestNew({
-    reqBodySchema: OrderBodyValidator,
+    reqBodySchema: CheckOutValidator,
   }),
   orderController.checkDeliveryPossibleOrNot,
   orderController.getCheckOutDetails,
