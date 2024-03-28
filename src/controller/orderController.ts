@@ -393,9 +393,18 @@ const getAllOrdersAdmin = catchAsync(async (req: Request, res: Response) => {
   const orderRepo = myDataSource.getRepository(Order);
   const orders = await orderRepo.find({
     relations: {
-      orderAddress: true,
+      orderAddress: {
+        pincode: true,
+      },
       orderItems: {
         productItem: true,
+      },
+      user: {
+        profile: true,
+      },
+      razorpayPayment: true,
+      billingAddress: {
+        pincode: true,
       },
     },
   });
