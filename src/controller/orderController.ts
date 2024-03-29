@@ -406,6 +406,9 @@ const getAllOrdersAdmin = catchAsync(async (req: Request, res: Response) => {
         pincode: true,
       },
     },
+    order: {
+      createdAt: 'DESC'
+    }
   });
   return res.status(200).json({
     status: true,
