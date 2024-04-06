@@ -9,7 +9,8 @@
     "migration:run": "typeorm-ts-node-esm -d src/utils/app-data-source.ts migration:run",
     "rollup": "rollup -c",
     "dev:prod": "pm2 start ecosystem.config.cjs --env production --only app",
-    "dev:prod:stop": "pm2 delete NodeServer"
+    "dev:prod:stop": "pm2 delete NodeServer",
+    "email": "email dev"
   },
   "type": "module",
   "devDependencies": {
@@ -37,7 +38,10 @@
     "@adminjs/typeorm": "^5.0.0",
     "@adminjs/upload": "^4.0.2",
     "@paralleldrive/cuid2": "^2.2.2",
+    "@plunk/node": "^3.0.0",
     "@prisma/client": "5.8.1",
+    "@react-email/components": "0.0.16",
+    "@react-email/render": "^0.0.12",
     "@types/cors": "^2.8.17",
     "@types/passport": "^1.0.13",
     "@types/passport-jwt": "^3.0.10",
@@ -67,6 +71,7 @@
     "postgres": "^3.4.3",
     "prom-client": "^15.1.0",
     "razorpay": "^2.9.2",
+    "react-email": "2.1.1",
     "socket.io": "^4.7.2",
     "ts-node": "^10.9.1",
     "tsc-alias": "^1.8.8",

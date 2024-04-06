@@ -36,6 +36,7 @@ await myDataSource.initialize();
 app.use(express.json());
 
 app.use('/public', express.static('public'));
+app.use('/static', express.static('static'));
 
 app.use('/', router);
 
