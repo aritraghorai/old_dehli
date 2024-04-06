@@ -16,7 +16,7 @@ interface PlaidVerifyIdentityEmailProps {
 }
 
 const baseUrl = process.env.BACKEND_URL
-  ? `https://${process.env.BACKEND_URL}`
+  ? `https://iamag.duckdns.org`
   : "";
 
 export const PlaidVerifyIdentityEmail = ({
