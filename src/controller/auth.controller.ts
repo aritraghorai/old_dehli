@@ -22,34 +22,40 @@ const gernerateTokenAndSendResponse = (user: User, res: Response) => {
 }
 
 const registerAndSendOtp = catchAsync(async (req: Request<{}, {}, RegisterSendOtpValidatorType>, res: Response, next: NextFunction) => {
-  const { name, phoneNumber, password } = req.body
+  const { name, phoneNumber, password, email } = req.body
 
   myDataSource.transaction(async (tx) => {
     const userRepo = tx.getRepository(User)
     const otpRepo = tx.getRepository(Otp)
     //Check if user exist
     const userExist = await userRepo.findOne({
-      where: {
-        phoneNumber
-      }
+      where: [
+        {
+          phoneNumber
+        },
+        {
+          email
+        }
+      ]
     })
     if (userExist) {
       return res.status(400).json({
         status: false,
-        message: 'User already exist',
+        message: 'User With This Phone Number Or Email Already Exist',
       })
     }
     //create a new user
     const user = userRepo.create({
       name,
       phoneNumber,
+      email,
       password: await bcryptService.encryptPassword(password)
     })
     await userRepo.save(user)
     //generate otp
     const otp = otpService.generateOtp()
     //send otp
-    await otpService.sendOtp(otp, phoneNumber)
+    await otpService.sendOtp(otp, email)
     //create a new otp
     const otpEntity = otpRepo.create({
       otp: await bcryptService.encryptPassword(otp),
@@ -64,7 +70,7 @@ const registerAndSendOtp = catchAsync(async (req: Request<{}, {}, RegisterSendOt
 })
 
 const verifyOtp = catchAsync(async (req: Request<{}, {}, VerifyOtpValidatorType>, res: Response, next: NextFunction) => {
-  const { phoneNumber, otp } = req.body
+  const { email, otp } = req.body
 
   await myDataSource.transaction(async (tx) => {
     const userRepo = tx.getRepository(User)
@@ -72,7 +78,7 @@ const verifyOtp = catchAsync(async (req: Request<{}, {}, VerifyOtpValidatorType>
     //Check if user exist
     const userExist = await userRepo.findOne({
       where: {
-        phoneNumber
+        email
       },
     })
     if (!userExist) {
@@ -126,11 +132,11 @@ const verifyOtp = catchAsync(async (req: Request<{}, {}, VerifyOtpValidatorType>
 })
 
 export const login = catchAsync(async (req: Request<{}, {}, LoginValidatorType>, res: Response, next: NextFunction) => {
-  const { phoneNumber, password } = req.body
+  const { email, password } = req.body
   const userRepo = myDataSource.getRepository(User)
   const user = await userRepo.findOne({
     where: {
-      phoneNumber,
+      email,
       isVerified: true
     }
   })

@@ -3,7 +3,7 @@ const generateOtp = () => {
   return "123456"
 }
 
-const sendOtp = async (otp: string, mobileNumber: string) => {
+const sendOtp = async (otp: string, email: string) => {
   return Promise.resolve(true)
 }
 
