@@ -24,6 +24,7 @@ const superAdmin = userRepo.create({
   password: await bcryptService.encryptPassword('Password@123'),
   name: 'Admin',
   phoneNumber: '1234567890',
+  email:"admin@gmail.com",
   role: roles,
   isVerified: true,
 });

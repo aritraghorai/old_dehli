@@ -21,4 +21,20 @@ export const LoginValidator = z.object({
   password: z.string().min(6).max(255)
 })
 
+export const ForgotPasswordValidator = z.object({
+  email: z.string().email().max(255)
+})
+
+export type ForgotPasswordValidatorType = z.infer<typeof ForgotPasswordValidator>
+
+export const ResetPasswordValidator = z.object({
+  email: z.string().email().max(255),
+  password: z.string().min(6).max(255),
+  otp: z.string().min(6).max(6)
+})
+
+
+export type ResetPasswordValidatorType = z.infer<typeof ResetPasswordValidator>
+
+
 export type LoginValidatorType = z.infer<typeof LoginValidator>

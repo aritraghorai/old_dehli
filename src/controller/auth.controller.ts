@@ -5,7 +5,7 @@ import jwtService from "@/services/jwt.service.js";
 import otpService from "@/services/otp.service.js";
 import { myDataSource } from "@/utils/app-data-source.js";
 import catchAsync from "@/utils/catchAsync.js";
-import { LoginValidatorType, RegisterSendOtpValidatorType, VerifyOtpValidatorType } from "@/validator/auth.validator.js";
+import { ForgotPasswordValidatorType, LoginValidatorType, RegisterSendOtpValidatorType, ResetPasswordValidatorType, VerifyOtpValidatorType } from "@/validator/auth.validator.js";
 import { NextFunction, Request, Response } from "express";
 
 const gernerateTokenAndSendResponse = (user: User, res: Response) => {
@@ -156,6 +156,95 @@ export const login = catchAsync(async (req: Request<{}, {}, LoginValidatorType>,
   return gernerateTokenAndSendResponse(user, res)
 })
 
+const forgotPassword = catchAsync(async (req: Request<any, any, ForgotPasswordValidatorType>, res: Response, next: NextFunction) => {
+  const { email } = req.body
+  const userRepo = myDataSource.getRepository(User)
+  const otpRepo = myDataSource.getRepository(Otp)
+  const user = await userRepo.findOne({
+    where: {
+      email
+    }
+  })
+  if (!user) {
+    return res.status(400).json({
+      status: false,
+      message: 'User not exist',
+    })
+  }
+  const otp = otpService.generateOtp()
+  await otpService.sendOtp(otp, email)
+  await otpRepo.save(otpRepo.create({
+    otp: await bcryptService.encryptPassword(otp),
+    user
+  }))
+  return res.status(200).json({
+    status: true,
+    message: 'Otp sent to your email',
+  })
+})
+
+const resetPassword = catchAsync(async (req: Request<any, any, ResetPasswordValidatorType>, res: Response, next: NextFunction) => {
+  const { email, password, otp } = req.body
+  await myDataSource.transaction(async (tx) => {
+    const userRepo = tx.getRepository(User)
+    const otpRepo = tx.getRepository(Otp)
+    //Check if user exist
+    const userExist = await userRepo.findOne({
+      where: {
+        email
+      },
+    })
+    if (!userExist) {
+      return res.status(400).json({
+        status: false,
+        message: 'User not exist',
+      })
+    }
+    //Check if otp exist
+    const otpExist = await otpRepo.findOne({
+      where: {
+        user: {
+          id: userExist.id
+        }
+      },
+      order: {
+        createdAt: 'DESC'
+      }
+    })
+    if (!otpExist) {
+      return res.status(400).json({
+        status: false,
+        message: 'Otp not found',
+      })
+    }
+    //Check if otp match
+    const otpMatch = await bcryptService.comparePassword(otp, otpExist.otp)
+    if (!otpMatch) {
+      return res.status(400).json({
+        status: false,
+        message: 'Otp not match',
+      })
+    }
+    //update user password
+    await userRepo.update({
+      id: userExist.id
+    }, {
+      password: await bcryptService.encryptPassword(password)
+    })
+    //delete otp
+    await otpRepo.delete({
+      user: {
+        id: userExist.id
+      }
+    })
+
+    return res.status(200).json({
+      status: true,
+      message: 'Password updated',
+    })
+  })
+})
+
 export const me = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
   return gernerateTokenAndSendResponse(req.user as User, res)
 })
@@ -165,5 +254,7 @@ export default {
   registerAndSendOtp,
   verifyOtp,
   login,
+  forgotPassword,
+  resetPassword,
   me
 }
