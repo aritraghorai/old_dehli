@@ -17,6 +17,10 @@ import { Router } from 'express';
 
 const orderRouter = Router();
 
+orderRouter.route('/pdf/:id').get(ValidateRequestNew({
+  paramSchema: praramIdValidator
+}), orderController.getOrderInVoice);
+
 orderRouter.use(extractUser);
 
 orderRouter.post(

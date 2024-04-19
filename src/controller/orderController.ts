@@ -1,4 +1,5 @@
 import { Address, Pincode, Zone } from '@/entities/address.entity.js';
+import fs from 'fs';
 import {
   BillingAddress,
   ORDER_STATUS_ENUM,
@@ -28,6 +29,7 @@ import {
 } from '@/validator/order.validator.js';
 import { NextFunction, Request, Response } from 'express';
 import timeslotController from './timeslot.controller.js';
+import orderPdfService from '@/services/pdf/order.pdf.service.ts';
 
 declare module 'express' {
   interface Request {
@@ -495,6 +497,29 @@ const makeOrderPaymentSuccess = catchAsync(
   },
 );
 
+const getOrderInVoice = catchAsync(async (req: Request<{ id: string }>, res: Response) => {
+  const { id } = req.params;
+  const orderRepo = myDataSource.getRepository(Order);
+  const order = await orderRepo.findOne({
+    where: { id },
+    relations: {
+      orderItems: {
+        productItem: true,
+      },
+      orderAddress: {
+        pincode: true,
+      },
+      billingAddress: true,
+      user: true,
+    },
+  });
+  const pdf = orderPdfService.createInvoice(order);
+  res.setHeader('Content-Type', 'application/pdf');
+  res.setHeader('Content-Disposition', `inline; filename=${order.id}.pdf`);
+  pdf.pipe(res);
+  pdf.end();
+})
+
 export default {
   createOrder,
   getOrders,
@@ -503,4 +528,5 @@ export default {
   getCheckOutDetails,
   checkDeliveryPossibleOrNot,
   makeOrderPaymentSuccess,
+  getOrderInVoice
 };
