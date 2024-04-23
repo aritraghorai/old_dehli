@@ -37,7 +37,7 @@ export const uploadImage = multer({
   storage: storage,
   fileFilter: function (_req, file, cb) {
     const ext = path.extname(file.originalname);
-    if (ext !== '.png' && ext !== '.jpg' && ext !== '.gif' && ext !== '.jpeg') {
+    if (ext !== '.png' && ext !== '.jpg' && ext !== '.gif' && ext !== '.jpeg'&& ext !== '.webp') {
       return cb(
         new AppError('Only image files are allowed!', 300) as any,
         false,

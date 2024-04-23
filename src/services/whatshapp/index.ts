@@ -27,7 +27,7 @@ const sendMessage = async (message: string, phoneNo: string) => {
     const res = await tc.messages.create({
       body: message,
       from: 'whatsapp:+14155238886',
-      to: `whatsapp:+91${phoneNo}`,
+      to: `whatsapp:+919434415051`,
     });
     console.log(res);
   } catch (error) {
