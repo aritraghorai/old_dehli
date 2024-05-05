@@ -16,6 +16,7 @@ import pincodeRouter from './pincode.router.js';
 import zoneRouter from './zones.routes.js';
 import timeSlotRouter from './timeslot.routes.js';
 import statusRouter from './status.routes.ts';
+import bannerRouter from './banner.routes.ts';
 
 const router = Router();
 
@@ -35,6 +36,7 @@ router.use('/user', userRouter);
 router.use('/pin-code', pincodeRouter);
 router.use('/zones', zoneRouter);
 router.use('/timeslot', timeSlotRouter);
-router.use('/status', statusRouter)
+router.use('/status', statusRouter);
+router.use('/banner', bannerRouter);
 
 export default router;
