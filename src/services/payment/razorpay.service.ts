@@ -2,6 +2,7 @@ import Razorpay from 'razorpay';
 import crypto from 'crypto';
 import _l from 'lodash';
 import env from '@/utils/env.js';
+import AppError from '@/utils/AppError.ts';
 
 const RAZORPAY_KEY_ID = env.RAZORPAY_KEY_ID;
 const RAZOR_PAY_KEY_SECRET = env.RAZOR_PAY_KEY_SECRET;
@@ -20,14 +21,18 @@ export const createOrderRazerPay = async (
   partial_payment = false,
   currency = 'INR',
 ) => {
-  const res = await instance.orders.create({
-    amount: _l.parseInt(String(amount)),
-    currency,
-    receipt,
-    partial_payment: partial_payment,
-    notes: notes,
-  });
-  return res;
+  try {
+    const res = await instance.orders.create({
+      amount: _l.parseInt(String(amount)),
+      currency,
+      receipt,
+      partial_payment: partial_payment,
+      notes: notes,
+    });
+    return res;
+  } catch (error) {
+    throw new AppError(error.error.description + ' Razorpay', error.statusCode);
+  }
 };
 export const fetchDetailByOrderId = async (orderId: string) => {
   const res = await instance.orders.fetch(orderId);

@@ -319,12 +319,12 @@ const createOrder = catchAsync(
         // send sms
         // send email
         // send notification
-        await whatshapp.sendMessage(
-          `${user.name}, your order has been placed successfully.
-      Your order id is ${newOrder.id} and total amount is ${newOrder.grandTotal}.
-      Our delivery executive will contact you soon. Thank you for shopping with us.`,
-          user.phoneNumber,
-        );
+      //   await whatshapp.sendMessage(
+      //     `${user.name}, your order has been placed successfully.
+      // Your order id is ${newOrder.id} and total amount is ${newOrder.grandTotal}.
+      // Our delivery executive will contact you soon. Thank you for shopping with us.`,
+      //     user.phoneNumber,
+      //   );
         return res.status(201).json({
           status: true,
           message: 'Order created successfully',
