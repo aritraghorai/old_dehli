@@ -319,12 +319,12 @@ const createOrder = catchAsync(
         // send sms
         // send email
         // send notification
-      //   await whatshapp.sendMessage(
-      //     `${user.name}, your order has been placed successfully.
-      // Your order id is ${newOrder.id} and total amount is ${newOrder.grandTotal}.
-      // Our delivery executive will contact you soon. Thank you for shopping with us.`,
-      //     user.phoneNumber,
-      //   );
+        await whatshapp.sendMessage(
+          `${user.name}, your order has been placed successfully.
+      Your order id is ${newOrder.id} and total amount is ${newOrder.grandTotal}.
+      Our delivery executive will contact you soon. Thank you for shopping with us.`,
+          user.phoneNumber,
+        );
         return res.status(201).json({
           status: true,
           message: 'Order created successfully',
@@ -409,8 +409,8 @@ const getAllOrdersAdmin = catchAsync(async (req: Request, res: Response) => {
       },
     },
     order: {
-      createdAt: 'DESC'
-    }
+      createdAt: 'DESC',
+    },
   });
   return res.status(200).json({
     status: true,
@@ -497,28 +497,30 @@ const makeOrderPaymentSuccess = catchAsync(
   },
 );
 
-const getOrderInVoice = catchAsync(async (req: Request<{ id: string }>, res: Response) => {
-  const { id } = req.params;
-  const orderRepo = myDataSource.getRepository(Order);
-  const order = await orderRepo.findOne({
-    where: { id },
-    relations: {
-      orderItems: {
-        productItem: true,
+const getOrderInVoice = catchAsync(
+  async (req: Request<{ id: string }>, res: Response) => {
+    const { id } = req.params;
+    const orderRepo = myDataSource.getRepository(Order);
+    const order = await orderRepo.findOne({
+      where: { id },
+      relations: {
+        orderItems: {
+          productItem: true,
+        },
+        orderAddress: {
+          pincode: true,
+        },
+        billingAddress: true,
+        user: true,
       },
-      orderAddress: {
-        pincode: true,
-      },
-      billingAddress: true,
-      user: true,
-    },
-  });
-  const pdf = orderPdfService.createInvoice(order);
-  res.setHeader('Content-Type', 'application/pdf');
-  res.setHeader('Content-Disposition', `inline; filename=${order.id}.pdf`);
-  pdf.pipe(res);
-  pdf.end();
-})
+    });
+    const pdf = orderPdfService.createInvoice(order);
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `inline; filename=${order.id}.pdf`);
+    pdf.pipe(res);
+    pdf.end();
+  },
+);
 
 export default {
   createOrder,
@@ -528,5 +530,5 @@ export default {
   getCheckOutDetails,
   checkDeliveryPossibleOrNot,
   makeOrderPaymentSuccess,
-  getOrderInVoice
+  getOrderInVoice,
 };

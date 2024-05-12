@@ -5,6 +5,7 @@ import {
   ProductCofiguration,
   ProductItem,
   ProductType,
+  Shop,
 } from '@/entities/product.entity.js';
 import { TimeSlot } from '@/entities/timeslot.entity.js';
 import AppError from '@/utils/AppError.js';
@@ -336,6 +337,7 @@ const updateProduct = catchAsync(
       productType,
       timeSlot,
       minOrderQuantity,
+      shopId,
     } = req.body;
     const product = await Product.findOneById(id);
     if (!product) {
@@ -390,6 +392,17 @@ const updateProduct = catchAsync(
     }
     if (minOrderQuantity) {
       product.minOrderQuantity = minOrderQuantity;
+    }
+    if (shopId) {
+      const shop = await Shop.findOne({
+        where: {
+          id: shopId,
+        },
+      });
+      if (!shop) {
+        throw new AppError('Shop not found', 404);
+      }
+      product.shop = shop;
     }
     if (isActive !== undefined) product.isActive = isActive;
     await product.save();

@@ -49,6 +49,7 @@ export const UpdateProductRequestBodyValidator = z.object({
   name: z.string().min(3).max(255).optional(),
   description: z.string().min(3).max(255).optional(),
   slug: z.string().min(3).max(255).optional(),
+  shopId: z.string().uuid().optional(),
   price: z.coerce
     .number()
     .positive()

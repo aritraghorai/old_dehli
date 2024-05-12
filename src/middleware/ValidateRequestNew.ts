@@ -15,6 +15,7 @@ const ValidateRequestNew = ({
 }: ValidateRequestNewProps) => {
   return catchAsync(
     async (req: Request, _res: Response, next: NextFunction) => {
+      console.log('req.body', req.body);
       if (reqBodySchema) req.body = await reqBodySchema.parseAsync(req.body);
       if (queryParamSchema) {
         req.query = await queryParamSchema.parseAsync(req.query);
