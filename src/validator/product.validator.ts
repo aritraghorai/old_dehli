@@ -16,6 +16,11 @@ export const NewProductBodyValidator = z.object({
   price: z.number().positive(),
   productType: z.string().uuid(),
   timeSlot: z.string().uuid(),
+  priority: z.coerce
+    .number()
+    .positive()
+    .optional()
+    .transform(val => +val),
   minOrderQuantity: z.coerce
     .number()
     .positive()
@@ -51,6 +56,11 @@ export const UpdateProductRequestBodyValidator = z.object({
   slug: z.string().min(3).max(255).optional(),
   shopId: z.string().uuid().optional(),
   price: z.coerce
+    .number()
+    .positive()
+    .optional()
+    .transform(val => +val),
+  priority: z.coerce
     .number()
     .positive()
     .optional()

@@ -9,7 +9,7 @@ import imageController from './image.controller.ts';
 
 const createBanner = catchAsync(
   async (req: Request<any, any, CreateBannerInput>, res: Response) => {
-    const { name, image, category } = req.body;
+    const { name, image, category, position } = req.body;
     const imageFind = await Image.findOne({
       where: { id: image },
     });
@@ -30,6 +30,9 @@ const createBanner = catchAsync(
     banner.name = name;
     banner.image = imageFind;
     banner.category = categoryFind;
+    if (position) {
+      banner.position = position;
+    }
     await banner.save();
 
     res.status(201).json({

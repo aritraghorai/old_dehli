@@ -25,7 +25,7 @@ const sendMessage = async (message: string, phoneNo: string) => {
     //   },
     // );
     const res = await tc.messages.create({
-      body: message,
+      body: "	Your Order abc is deliver.",
       from: 'whatsapp:+919958682539',
       to: `whatsapp:+918101938115`,
     });

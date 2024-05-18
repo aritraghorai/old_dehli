@@ -45,6 +45,9 @@ const getAllProduct = catchAsync(
           isActive: true,
         },
       ],
+      order: {
+        priority: 'DESC',
+      },
       relations: {
         category: true,
         shop: true,
@@ -79,6 +82,9 @@ const getAllProductAdmin = catchAsync(
         type: true,
         timeSlot: true,
         allowZones: true,
+      },
+      order: {
+        priority: 'DESC',
       },
     });
     res.status(200).json({
@@ -127,6 +133,7 @@ const createProduct = catchAsync(
       productType,
       timeSlot,
       minOrderQuantity,
+      priority,
     } = req.body;
     const slug = name.toLowerCase().split(' ').join('-');
     await myDataSource.transaction(async tx => {
@@ -166,6 +173,7 @@ const createProduct = catchAsync(
         type: productTypeExist,
         timeSlot: timeSlotExist,
         minOrderQuantity,
+        priority,
       });
       await tx.save(product);
       res.status(201).json({
@@ -338,6 +346,7 @@ const updateProduct = catchAsync(
       timeSlot,
       minOrderQuantity,
       shopId,
+      priority,
     } = req.body;
     const product = await Product.findOneById(id);
     if (!product) {
@@ -403,6 +412,9 @@ const updateProduct = catchAsync(
         throw new AppError('Shop not found', 404);
       }
       product.shop = shop;
+    }
+    if (priority) {
+      product.priority = priority;
     }
     if (isActive !== undefined) product.isActive = isActive;
     await product.save();

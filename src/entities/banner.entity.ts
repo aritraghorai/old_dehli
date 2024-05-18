@@ -16,6 +16,9 @@ export class Banner extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Column({ type: 'int', default: 1 })
+  position: number;
+
   @ManyToOne(() => Image, i => i.id, { eager: true })
   @JoinColumn({ name: 'image_id' })
   image: Image;

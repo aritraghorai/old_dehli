@@ -1,3 +1,5 @@
+import { Video } from '@/entities/video.entity.ts';
+import { myCloudinary } from '@/middleware/uploadFile.middleware.ts';
 import { ImageRepository } from '@/orm/datasources/index.js';
 import AppError from '@/utils/AppError.js';
 import catchAsync from '@/utils/catchAsync.js';
@@ -26,6 +28,42 @@ const uploadImge = catchAsync(
   },
 );
 
+const uploadVideo = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const file = req.file as Express.Multer.File;
+    const video = Video.create({
+      url: file.path,
+      filename: file.filename,
+      path: file.path,
+    });
+
+    await video.save();
+
+    res.status(200).json({
+      status: true,
+      message: 'Upload image successfully!',
+      data: video,
+    });
+  },
+);
+
+const deleteVideo = async (videoUrl: string) => {
+  const video = await Video.findOne({
+    where: { url: videoUrl },
+    select: {
+      filename: true,
+    },
+  });
+  if (!video) {
+    return;
+  }
+  console.log(video);
+  await myCloudinary.uploader.destroy(video.filename);
+  await Video.delete({
+    id: video.id,
+  });
+};
+
 const deleteImage = async (imageId: string) => {
   const image = await ImageRepository.findOne({
     where: { id: imageId },
@@ -44,4 +82,6 @@ const deleteImage = async (imageId: string) => {
 export default {
   uploadImge,
   deleteImage,
+  uploadVideo,
+  deleteVideo,
 };

@@ -3,6 +3,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   JoinColumn,
   JoinTable,
   ManyToMany,
@@ -165,6 +166,10 @@ export class Product extends BaseEntity {
 
   @Column({ type: 'float' })
   price: number;
+
+  @Column({ type: 'int', default: 1 })
+  @Index()
+  priority: number;
 
   @ManyToMany(() => ProductTag, { eager: true, onDelete: 'NO ACTION' })
   @JoinTable({ name: 'product_productTag' })
