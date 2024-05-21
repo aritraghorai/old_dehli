@@ -16,11 +16,7 @@ export const NewProductBodyValidator = z.object({
   price: z.number().positive(),
   productType: z.string().uuid(),
   timeSlot: z.string().uuid(),
-  priority: z.coerce
-    .number()
-    .positive()
-    .optional()
-    .transform(val => +val),
+  allowZones: z.array(z.string().uuid()).optional(),
   minOrderQuantity: z.coerce
     .number()
     .positive()
@@ -65,6 +61,7 @@ export const UpdateProductRequestBodyValidator = z.object({
     .positive()
     .optional()
     .transform(val => +val),
+  allowZones: z.array(z.string().uuid()).optional(),
   isActive: z.boolean().optional(),
   categoryId: z.string().uuid().optional(),
   productType: z.string().uuid().optional(),

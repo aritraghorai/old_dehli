@@ -1,3 +1,4 @@
+import { Zone } from '@/entities/address.entity.ts';
 import { Category } from '@/entities/category.entity.js';
 import {
   OptionValue,
@@ -19,7 +20,7 @@ import {
   UpdateProductRequestBody,
 } from '@/validator/product.validator.js';
 import { NextFunction, Request, Response } from 'express';
-import { Like, MoreThan } from 'typeorm';
+import { In, Like, MoreThan } from 'typeorm';
 
 const getAllProduct = catchAsync(
   async (
@@ -133,7 +134,7 @@ const createProduct = catchAsync(
       productType,
       timeSlot,
       minOrderQuantity,
-      priority,
+      allowZones,
     } = req.body;
     const slug = name.toLowerCase().split(' ').join('-');
     await myDataSource.transaction(async tx => {
@@ -173,8 +174,17 @@ const createProduct = catchAsync(
         type: productTypeExist,
         timeSlot: timeSlotExist,
         minOrderQuantity,
-        priority,
       });
+
+      if (!!allowZones) {
+        const zones = await Zone.find({
+          where: {
+            id: In(allowZones),
+          },
+        });
+        product.allowZones = zones;
+      }
+
       await tx.save(product);
       res.status(201).json({
         status: true,
@@ -347,6 +357,7 @@ const updateProduct = catchAsync(
       minOrderQuantity,
       shopId,
       priority,
+      allowZones,
     } = req.body;
     const product = await Product.findOneById(id);
     if (!product) {
@@ -417,6 +428,15 @@ const updateProduct = catchAsync(
       product.priority = priority;
     }
     if (isActive !== undefined) product.isActive = isActive;
+    if (!!allowZones) {
+      const zones = await Zone.find({
+        where: {
+          id: In(allowZones),
+        },
+      });
+      product.allowZones = zones;
+    }
+
     await product.save();
     res.status(200).json({
       status: true,
