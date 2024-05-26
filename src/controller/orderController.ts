@@ -383,6 +383,8 @@ const getOrders = catchAsync(
             images: true,
           },
         },
+        billingAddress: true,
+        razorpayPayment: true,
       },
     });
     return res.status(200).json({
