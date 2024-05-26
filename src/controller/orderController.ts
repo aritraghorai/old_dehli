@@ -26,14 +26,29 @@ import {
   payemntSuccessBodyType,
 } from '@/validator/order.validator.js';
 import { NextFunction, Request, Response } from 'express';
-import timeslotController from './timeslot.controller.js';
 import orderPdfService from '@/services/pdf/order.pdf.service.ts';
+import plunkService from '@/services/email/plunk.service.ts';
+import { render } from '@react-email/render';
+import Order_Email from 'emails/order/index.tsx';
+import orders from 'razorpay/dist/types/orders.js';
 
 declare module 'express' {
   interface Request {
     deliveryCharge?: number;
     isAllIndia?: boolean;
   }
+}
+
+const sendOrderStatusEmail = async (email: string[], order: Order, status: string) => {
+  email.forEach(async e => {
+    try {
+      await plunkService.sendEmail(e, `Order ${status} Successfully`,
+        render(Order_Email({ order, status })));
+    } catch (e) {
+      console.log(e)
+    }
+  })
+
 }
 
 const getCheckOutDetails = catchAsync(
@@ -246,6 +261,7 @@ const createOrder = catchAsync(
         address: billingAddress.address,
         landmark: billingAddress.landmark,
         city: billingAddress.city,
+        state: billingAddress.state,
       });
 
       // save billing address
@@ -322,9 +338,11 @@ const createOrder = catchAsync(
       const userCardItemRepo = trx.getRepository(CartItem);
       await userCardItemRepo.delete({ cart: userCart });
       if (req.body.paymentMethod === PAYMENT_GATEWAY.CASH_ON_DELIVERY) {
+        newOrder.orderItems = newOrderItems;
         // send sms
         // send email
         // send notification
+        await sendOrderStatusEmail([user.email], newOrder, "Placed");
         return res.status(201).json({
           status: true,
           message: 'Order created successfully',
@@ -432,6 +450,7 @@ const updateOrder = catchAsync(
     order.status = req.body.status || order.status;
     order.paymentStatus = req.body.paymentStatus || order.paymentStatus;
     await orderRepo.save(order);
+    await sendOrderStatusEmail([order.user.email], order, req.body.status);
     return res.status(200).json({
       status: true,
       message: 'Order updated successfully',
