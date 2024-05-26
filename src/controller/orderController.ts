@@ -1,5 +1,4 @@
 import { Address, Pincode, Zone } from '@/entities/address.entity.js';
-import fs from 'fs';
 import {
   BillingAddress,
   ORDER_STATUS_ENUM,
@@ -11,7 +10,6 @@ import {
   RazorpayPayment,
 } from '@/entities/order.entity.js';
 import { ProductItem } from '@/entities/product.entity.js';
-import { TimeSlot } from '@/entities/timeslot.entity.js';
 import { CartItem, User, UserCart } from '@/entities/user.entiry.js';
 import {
   createOrderRazerPay,
@@ -34,6 +32,7 @@ import orderPdfService from '@/services/pdf/order.pdf.service.ts';
 declare module 'express' {
   interface Request {
     deliveryCharge?: number;
+    isAllIndia?: boolean;
   }
 }
 
@@ -45,6 +44,7 @@ const getCheckOutDetails = catchAsync(
       data: {
         deliveryCharge,
       },
+      isAllIndia: req.isAllIndia,
     });
   },
 );
@@ -149,6 +149,7 @@ const checkDeliveryPossibleOrNot = catchAsync(
       const zoneRepo = trx.getRepository(Zone);
 
       let deliveryCharge = 0;
+      let isAllIndia = false;
 
       let zone = await zoneRepo.findOne({
         where: {
@@ -165,6 +166,7 @@ const checkDeliveryPossibleOrNot = catchAsync(
             name: 'All India',
           },
         });
+        isAllIndia = true;
         //calculate delivery charge by weight
         for (const item of userCart.cardItems) {
           deliveryCharge +=
@@ -173,6 +175,7 @@ const checkDeliveryPossibleOrNot = catchAsync(
       }
 
       req.deliveryCharge = deliveryCharge;
+      req.isAllIndia = isAllIndia;
 
       next();
     });
@@ -329,6 +332,7 @@ const createOrder = catchAsync(
           status: true,
           message: 'Order created successfully',
           data: newOrder,
+          isAllIndia: req.isAllIndia,
         });
       }
 
@@ -358,6 +362,7 @@ const createOrder = catchAsync(
           order: newOrder,
           razorpayOrder,
         },
+        isAllIndia: req.isAllIndia,
       });
     });
   },
