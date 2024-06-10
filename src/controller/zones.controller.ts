@@ -1,9 +1,25 @@
 import { Pincode, Zone } from '@/entities/address.entity.js';
 import { Product } from '@/entities/product.entity.js';
+import { readEcexl } from '@/services/exel/excel.service.ts';
 import AppError from '@/utils/AppError.js';
 import catchAsync from '@/utils/catchAsync.js';
 import { NewZone } from '@/validator/zones.validator.js';
 import { Request, Response } from 'express';
+import pincodeController from './pincode.controller.ts';
+import _ from 'lodash';
+import fs from 'fs/promises';
+
+const removeDuplicateAndNull = (codes: string[]) => {
+  const map = new Map<string, true>();
+  const newCode = [];
+  for (const code of codes) {
+    if (code !== undefined && _.isNumber(code) && !map.has(code)) {
+      newCode.push(code);
+      map.set(code, true);
+    }
+  }
+  return newCode;
+};
 
 const createNewZone = catchAsync(
   async (req: Request<any, any, NewZone>, res: Response) => {
@@ -95,7 +111,7 @@ const updateZoneById = catchAsync(
       data: updatedZone,
     });
   },
-)
+);
 
 const getAllZones = catchAsync(async (req: Request, res: Response) => {
   const zones = await Zone.find({
@@ -112,8 +128,57 @@ const getAllZones = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const uploadOrUpdateMultipleZones = catchAsync(
+  async (req: Request, res: Response) => {
+    const file = req.file as Express.Multer.File;
+    if (!file) {
+      throw new AppError('Upload file not found', 404);
+    }
+    try {
+      const zones = await readEcexl(file.path);
+      for (let key of Object.keys(zones)) {
+        //Check zone with name is exist or not
+        let zone = await Zone.findOne({
+          where: {
+            name: key,
+          },
+        });
+        if (!zone) {
+          zone = Zone.create({
+            name: key,
+            deliveryCharges: 0,
+          });
+          await zone.save();
+        }
+        if (!zone.pincodes) {
+          zone.pincodes = [];
+        }
+        const pincodes = zones[key];
+        const pinCodeList = [];
+        for (let pinCode of removeDuplicateAndNull(pincodes)) {
+          try {
+            const newPinCode =
+              await pincodeController.checkPinCodeExistOrAdd(pinCode);
+            pinCodeList.push(newPinCode);
+          } catch (e) { }
+        }
+        zone.pincodes = pinCodeList;
+        await zone.save();
+      }
+      return res.status(200).json({
+        status: 'success',
+      });
+    } catch (e) {
+      throw new AppError('Invalid file', 400);
+    } finally {
+      await fs.unlink(file.path);
+    }
+  },
+);
+
 export default {
   createNewZone,
   getAllZones,
   updateZoneById,
+  uploadOrUpdateMultipleZones,
 };

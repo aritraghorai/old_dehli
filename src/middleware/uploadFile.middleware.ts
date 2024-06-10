@@ -1,6 +1,6 @@
 import AppError from '@/utils/AppError.js';
 import multer from 'multer';
-import path from 'path';
+import path, { extname } from 'path';
 import fs from 'fs';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import { v2 } from 'cloudinary';
@@ -29,9 +29,10 @@ export type multerFiledType = { [fieldname: string]: multerFile[] };
 
 const fileSize = 1024 * 1024 * 1; // 5MB
 const videoSize = 1024 * 1024 * 10; // 10MB
+const excelSize = 1024 * 1024 * 25; // 25MB
 
 const storage = multer.diskStorage({
-  destination: function(_req, _file, cb) {
+  destination: function (_req, _file, cb) {
     const path = 'public/uploads/image/';
     if (!fs.existsSync(path)) {
       fs.mkdirSync(path, {
@@ -40,7 +41,24 @@ const storage = multer.diskStorage({
     }
     cb(null, path);
   },
-  filename: function(_req, file, cb) {
+  filename: function (_req, file, cb) {
+    const ext = path.extname(file.originalname);
+    const baseName = path.basename(file.originalname) + '-' + Date.now();
+    cb(null, baseName + ext);
+  },
+});
+
+const excelStorage = multer.diskStorage({
+  destination: function (_req, _file, cb) {
+    const path = 'public/uploads/excel/';
+    if (!fs.existsSync(path)) {
+      fs.mkdirSync(path, {
+        recursive: true,
+      });
+    }
+    cb(null, path);
+  },
+  filename: function (_req, file, cb) {
     const ext = path.extname(file.originalname);
     const baseName = path.basename(file.originalname) + '-' + Date.now();
     cb(null, baseName + ext);
@@ -57,7 +75,7 @@ const cloudinaryStorage = new CloudinaryStorage({
 
 export const uploadImage = multer({
   storage: storage,
-  fileFilter: function(_req, file, cb) {
+  fileFilter: function (_req, file, cb) {
     const ext = path.extname(file.originalname);
     if (
       ext !== '.png' &&
@@ -80,7 +98,7 @@ export const uploadImage = multer({
 
 export const uploadVideo = multer({
   storage: cloudinaryStorage,
-  fileFilter: function(_req, file, cb) {
+  fileFilter: function (_req, file, cb) {
     const ext = path.extname(file.originalname);
     if (
       ext !== '.mp4' &&
@@ -99,5 +117,22 @@ export const uploadVideo = multer({
   },
   limits: {
     fileSize: videoSize,
+  },
+});
+
+export const uploadExcel = multer({
+  storage: excelStorage,
+  fileFilter: function (_req, file, cb) {
+    const ext = path.extname(file.originalname);
+    if (ext !== '.xlsx' && ext !== '.xls') {
+      return cb(
+        new AppError('Only excel files are allowed!', 300) as any,
+        false,
+      );
+    }
+    cb(null, true);
+  },
+  limits: {
+    fileSize: excelSize,
   },
 });

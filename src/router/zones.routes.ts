@@ -1,6 +1,9 @@
 import extractUser from '@/controller/extractUser.js';
 import zonesController from '@/controller/zones.controller.js';
 import ValidateRequestNew from '@/middleware/ValidateRequestNew.js';
+import restrictUser from '@/middleware/restrictUser.middleware.ts';
+import { uploadExcel } from '@/middleware/uploadFile.middleware.ts';
+import { ROLES } from '@/utils/Constant.ts';
 import { praramIdValidator } from '@/validator/common.validator.js';
 import { NewZoneValidator } from '@/validator/zones.validator.js';
 import { Router } from 'express';
@@ -25,6 +28,14 @@ zoneRouter.route('/:id').put(
     paramSchema: praramIdValidator,
   }),
   zonesController.updateZoneById,
+);
+
+zoneRouter.use(restrictUser(ROLES.ADMIN, ROLES.SUPER_ADMIN));
+
+zoneRouter.post(
+  '/multiple',
+  uploadExcel.single('file'),
+  zonesController.uploadOrUpdateMultipleZones,
 );
 
 export default zoneRouter;
