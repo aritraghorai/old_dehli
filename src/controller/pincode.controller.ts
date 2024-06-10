@@ -23,6 +23,8 @@ const checkPinCodeExistOrAdd = async (pinCode: string) => {
         pincode: pinCode,
       });
       await pincodeRepo.save(newPincode);
+
+      const postOffices = [];
       for (const detail of getPincodeDetail) {
         const newPostOffice = postOfficeRepo.create({
           name: detail.Name,
@@ -34,8 +36,9 @@ const checkPinCodeExistOrAdd = async (pinCode: string) => {
           state: detail.State,
           pincode: newPincode,
         });
-        await postOfficeRepo.save(newPostOffice);
+        postOffices.push(newPostOffice);
       }
+      await postOfficeRepo.save(postOffices);
       const pincode = await pincodeRepo.findOne({
         where: {
           pincode: pinCode,
