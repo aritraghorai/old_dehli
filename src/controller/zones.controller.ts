@@ -146,9 +146,7 @@ const updateZoneById = catchAsync(
 const getAllZones = catchAsync(async (req: Request, res: Response) => {
   const zones = await Zone.find({
     relations: {
-      pincodes: {
-        postOffices: true,
-      },
+      pincodes: true,
       products: true,
     },
   });
