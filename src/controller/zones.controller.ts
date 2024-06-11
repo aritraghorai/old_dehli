@@ -170,12 +170,12 @@ const uploadOrUpdateMultipleZones = catchAsync(
         //Check zone with name is exist or not
         let zone = await Zone.findOne({
           where: {
-            name: key,
+            name: key.trim(),
           },
         });
         if (!zone) {
           zone = Zone.create({
-            name: key,
+            name: key.trim(),
             deliveryCharges: 0,
           });
           await zone.save();
@@ -186,8 +186,9 @@ const uploadOrUpdateMultipleZones = catchAsync(
         const pincodes = zones[key];
 
         const filterPinCodes = removeDuplicateAndNull(pincodes);
-        zone.pincodes =
-          await pincodeController.checkPinCodesExistOrAdd(filterPinCodes);
+        zone.pincodes = await pincodeController.checkPinCodesExistOrAdd(
+          filterPinCodes,
+        );
         await zone.save();
       }
       return res.status(200).json({
