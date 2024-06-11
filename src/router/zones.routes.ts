@@ -11,6 +11,7 @@ import { Router } from 'express';
 const zoneRouter = Router();
 
 zoneRouter.use(extractUser);
+zoneRouter.use(restrictUser(ROLES.ADMIN, ROLES.SUPER_ADMIN));
 
 zoneRouter
   .route('/')
@@ -22,15 +23,21 @@ zoneRouter
   )
   .get(zonesController.getAllZones);
 
-zoneRouter.route('/:id').put(
-  ValidateRequestNew({
-    reqBodySchema: NewZoneValidator,
-    paramSchema: praramIdValidator,
-  }),
-  zonesController.updateZoneById,
-);
-
-zoneRouter.use(restrictUser(ROLES.ADMIN, ROLES.SUPER_ADMIN));
+zoneRouter
+  .route('/:id')
+  .put(
+    ValidateRequestNew({
+      reqBodySchema: NewZoneValidator,
+      paramSchema: praramIdValidator,
+    }),
+    zonesController.updateZoneById,
+  )
+  .delete(
+    ValidateRequestNew({
+      paramSchema: praramIdValidator,
+    }),
+    zonesController.deleteZoneById,
+  );
 
 zoneRouter.post(
   '/multiple',

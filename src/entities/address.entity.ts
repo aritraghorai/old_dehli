@@ -76,7 +76,7 @@ export class Zone extends BaseEntity {
   @Column({ type: 'varchar' })
   name: string;
 
-  @ManyToMany(() => Pincode, p => p.id, { eager: true })
+  @ManyToMany(() => Pincode, p => p.id, { eager: true, onDelete: 'CASCADE' })
   @JoinTable({ name: 'zone_pincode' })
   pincodes: Pincode[];
 

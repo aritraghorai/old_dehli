@@ -8,17 +8,47 @@ import { Request, Response } from 'express';
 import pincodeController from './pincode.controller.ts';
 import _ from 'lodash';
 import fs from 'fs/promises';
+import { In } from 'typeorm';
 
+//Indian pincode regex
+let regex = new RegExp(/^[1-9]{1}[0-9]{2}\s{0,1}[0-9]{3}$/);
 const removeDuplicateAndNull = (codes: string[]) => {
   const map = new Map<string, true>();
   const newCode = [];
-  for (const code of codes) {
-    if (code !== undefined && _.isNumber(code) && !map.has(code)) {
-      newCode.push(code);
-      map.set(code, true);
+  for (let code of codes) {
+    if (
+      code !== undefined &&
+      _.isNumber(code) &&
+      regex.test(code) &&
+      !map.has(code)
+    ) {
+      newCode.push(_.trim(code));
+      map.set(_.trim(code), true);
     }
   }
   return newCode;
+};
+
+const checkNotExistPinCodeAndAddThose = async (pinCodeList: string[]) => {
+  const pinCodes = await Pincode.find({
+    where: {
+      pincode: In(pinCodeList),
+    },
+  });
+  const pinCodeMap = new Map<string, Pincode>();
+  for (const pinCode of pinCodes) {
+    pinCodeMap.set(pinCode.pincode, pinCode);
+  }
+  if (pinCodes.length === pinCodeList.length) {
+    return pinCodes;
+  }
+  const notExistPinCodes = [];
+  for (const pinCode of pinCodeList) {
+    if (!pinCodeMap.has(pinCode)) {
+      notExistPinCodes.push(pinCode);
+    }
+  }
+  return pinCodes;
 };
 
 const createNewZone = catchAsync(
@@ -154,15 +184,10 @@ const uploadOrUpdateMultipleZones = catchAsync(
           zone.pincodes = [];
         }
         const pincodes = zones[key];
-        const pinCodeList = [];
-        for (let pinCode of removeDuplicateAndNull(pincodes)) {
-          try {
-            const newPinCode =
-              await pincodeController.checkPinCodeExistOrAdd(pinCode);
-            pinCodeList.push(newPinCode);
-          } catch (e) { }
-        }
-        zone.pincodes = pinCodeList;
+
+        const filterPinCodes = removeDuplicateAndNull(pincodes);
+        zone.pincodes =
+          await pincodeController.checkPinCodesExistOrAdd(filterPinCodes);
         await zone.save();
       }
       return res.status(200).json({
@@ -176,9 +201,28 @@ const uploadOrUpdateMultipleZones = catchAsync(
   },
 );
 
+const deleteZoneById = catchAsync(
+  async (req: Request<{ id: string }, any, any>, res: Response) => {
+    const zone = await Zone.findOne({
+      where: {
+        id: req.params.id,
+      },
+    });
+    if (!zone) {
+      throw new AppError('Zone not found', 404);
+    }
+    await zone.remove();
+    return res.status(200).json({
+      status: 'success',
+      message: 'Zone deleted successfully',
+    });
+  },
+);
+
 export default {
   createNewZone,
   getAllZones,
   updateZoneById,
   uploadOrUpdateMultipleZones,
+  deleteZoneById,
 };
