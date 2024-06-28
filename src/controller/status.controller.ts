@@ -1,9 +1,9 @@
-import { Status } from '@/entities/status.entity.ts';
-import AppError from '@/utils/AppError.ts';
-import catchAsync from '@/utils/catchAsync.ts';
-import { NewStatus, UpdateStatus } from '@/validator/status.validator.ts';
+import { Status } from '@/entities/status.entity.js';
+import AppError from '@/utils/AppError.js';
+import catchAsync from '@/utils/catchAsync.js';
+import { NewStatus, UpdateStatus } from '@/validator/status.validator.js';
 import { Request, Response } from 'express';
-import imageController from './image.controller.ts';
+import imageController from './image.controller.js';
 
 const createStatus = catchAsync(
   async (req: Request<any, any, NewStatus>, res: Response) => {

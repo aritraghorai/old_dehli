@@ -8,8 +8,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Category } from './category.entity.ts';
-import { Image } from './image.entity.ts';
+import { Category } from './category.entity.js';
+import { Image } from './image.entity.js';
 
 @Entity()
 export class Banner extends BaseEntity {

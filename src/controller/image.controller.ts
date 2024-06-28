@@ -1,5 +1,5 @@
-import { Video } from '@/entities/video.entity.ts';
-import { myCloudinary } from '@/middleware/uploadFile.middleware.ts';
+import { Video } from '@/entities/video.entity.js';
+import { myCloudinary } from '@/middleware/uploadFile.middleware.js';
 import { ImageRepository } from '@/orm/datasources/index.js';
 import AppError from '@/utils/AppError.js';
 import catchAsync from '@/utils/catchAsync.js';

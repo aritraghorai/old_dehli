@@ -1,8 +1,8 @@
-import bannerController from '@/controller/banner.controller.ts';
-import extractUser from '@/controller/extractUser.ts';
-import ValidateRequestNew from '@/middleware/ValidateRequestNew.ts';
-import { createBannerValidator } from '@/validator/banner.validator.ts';
-import { praramIdValidator } from '@/validator/common.validator.ts';
+import bannerController from '@/controller/banner.controller.js';
+import extractUser from '@/controller/extractUser.js';
+import ValidateRequestNew from '@/middleware/ValidateRequestNew.js';
+import { createBannerValidator } from '@/validator/banner.validator.js';
+import { praramIdValidator } from '@/validator/common.validator.js';
 import { Router } from 'express';
 
 const bannerRouter = Router();

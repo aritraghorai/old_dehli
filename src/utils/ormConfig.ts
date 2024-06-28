@@ -8,9 +8,9 @@ const config: ConnectionOptions = {
   url: env.DATABASE_URL,
   synchronize: true,
   logging: true,
-  entities: ['src/entities/**/*.ts'],
-  migrations: ['src/orm/migrations/**/*.ts'],
-  subscribers: ['src/orm/subscriber/**/*.ts'],
+  entities: ['src/entities/**/*.@(ts|js)]'],
+  migrations: ['src/orm/migrations/**/*.@(ts|js)'],
+  subscribers: ['src/orm/subscriber/**/*.@(ts|js)'],
   namingStrategy: new SnakeNamingStrategy(),
 };
 

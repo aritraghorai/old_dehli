@@ -1,11 +1,11 @@
 import { Pincode, Zone } from '@/entities/address.entity.js';
 import { Product } from '@/entities/product.entity.js';
-import { readEcexl } from '@/services/exel/excel.service.ts';
+import { readEcexl } from '@/services/exel/excel.service.js';
 import AppError from '@/utils/AppError.js';
 import catchAsync from '@/utils/catchAsync.js';
 import { NewZone } from '@/validator/zones.validator.js';
 import { Request, Response } from 'express';
-import pincodeController from './pincode.controller.ts';
+import pincodeController from './pincode.controller.js';
 import _ from 'lodash';
 import fs from 'fs/promises';
 import { In } from 'typeorm';
@@ -184,9 +184,8 @@ const uploadOrUpdateMultipleZones = catchAsync(
         const pincodes = zones[key];
 
         const filterPinCodes = removeDuplicateAndNull(pincodes);
-        zone.pincodes = await pincodeController.checkPinCodesExistOrAdd(
-          filterPinCodes,
-        );
+        zone.pincodes =
+          await pincodeController.checkPinCodesExistOrAdd(filterPinCodes);
         await zone.save();
       }
       return res.status(200).json({

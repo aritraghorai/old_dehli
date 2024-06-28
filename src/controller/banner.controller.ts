@@ -1,11 +1,11 @@
-import { Banner } from '@/entities/banner.entity.ts';
-import { Category } from '@/entities/category.entity.ts';
-import { Image } from '@/entities/image.entity.ts';
-import AppError from '@/utils/AppError.ts';
-import catchAsync from '@/utils/catchAsync.ts';
-import { CreateBannerInput } from '@/validator/banner.validator.ts';
+import { Banner } from '@/entities/banner.entity.js';
+import { Category } from '@/entities/category.entity.js';
+import { Image } from '@/entities/image.entity.js';
+import AppError from '@/utils/AppError.js';
+import catchAsync from '@/utils/catchAsync.js';
+import { CreateBannerInput } from '@/validator/banner.validator.js';
 import { Request, Response } from 'express';
-import imageController from './image.controller.ts';
+import imageController from './image.controller.js';
 
 const createBanner = catchAsync(
   async (req: Request<any, any, CreateBannerInput>, res: Response) => {

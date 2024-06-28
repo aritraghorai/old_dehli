@@ -26,11 +26,10 @@ import {
   payemntSuccessBodyType,
 } from '@/validator/order.validator.js';
 import { NextFunction, Request, Response } from 'express';
-import orderPdfService from '@/services/pdf/order.pdf.service.ts';
-import plunkService from '@/services/email/plunk.service.ts';
+import orderPdfService from '@/services/pdf/order.pdf.service.js';
+import plunkService from '@/services/email/plunk.service.js';
 import { render } from '@react-email/render';
-import Order_Email from 'emails/order/index.tsx';
-import orders from 'razorpay/dist/types/orders.js';
+import Order_Email from 'emails/order/index.js';
 
 declare module 'express' {
   interface Request {
@@ -39,17 +38,23 @@ declare module 'express' {
   }
 }
 
-const sendOrderStatusEmail = async (email: string[], order: Order, status: string) => {
+const sendOrderStatusEmail = async (
+  email: string[],
+  order: Order,
+  status: string,
+) => {
   email.forEach(async e => {
     try {
-      await plunkService.sendEmail(e, `Order ${status} Successfully`,
-        render(Order_Email({ order, status })));
+      await plunkService.sendEmail(
+        e,
+        `Order ${status} Successfully`,
+        render(Order_Email({ order, status })),
+      );
     } catch (e) {
-      console.log(e)
+      console.log(e);
     }
-  })
-
-}
+  });
+};
 
 const getCheckOutDetails = catchAsync(
   async (req: Request<any, any, OrderBody>, res: Response) => {
@@ -342,7 +347,7 @@ const createOrder = catchAsync(
         // send sms
         // send email
         // send notification
-        await sendOrderStatusEmail([user.email], newOrder, "Placed");
+        await sendOrderStatusEmail([user.email], newOrder, 'Placed');
         return res.status(201).json({
           status: true,
           message: 'Order created successfully',

@@ -15,8 +15,8 @@ import productTypeRouter from './productType.rotes.js';
 import pincodeRouter from './pincode.router.js';
 import zoneRouter from './zones.routes.js';
 import timeSlotRouter from './timeslot.routes.js';
-import statusRouter from './status.routes.ts';
-import bannerRouter from './banner.routes.ts';
+import statusRouter from './status.routes.js';
+import bannerRouter from './banner.routes.js';
 
 const router = Router();
 

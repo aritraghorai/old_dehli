@@ -1,4 +1,4 @@
-import { Zone } from '@/entities/address.entity.ts';
+import { Zone } from '@/entities/address.entity.js';
 import { Category } from '@/entities/category.entity.js';
 import {
   OptionValue,

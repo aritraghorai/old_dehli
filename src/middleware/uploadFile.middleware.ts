@@ -4,7 +4,7 @@ import path, { extname } from 'path';
 import fs from 'fs';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import { v2 } from 'cloudinary';
-import env from '@/utils/env.ts';
+import env from '@/utils/env.js';
 import { v4 } from 'uuid';
 
 v2.config({

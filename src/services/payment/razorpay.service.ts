@@ -2,7 +2,7 @@ import Razorpay from 'razorpay';
 import crypto from 'crypto';
 import _l from 'lodash';
 import env from '@/utils/env.js';
-import AppError from '@/utils/AppError.ts';
+import AppError from '@/utils/AppError.js';
 
 const RAZORPAY_KEY_ID = env.RAZORPAY_KEY_ID;
 const RAZOR_PAY_KEY_SECRET = env.RAZOR_PAY_KEY_SECRET;
@@ -39,30 +39,30 @@ export const fetchDetailByOrderId = async (orderId: string) => {
   return res;
 };
 
-export const createPlan = async ({
-  name,
-  description,
-  amount,
-}: {
-  name: string;
-  description: string;
-  amount: number;
-}) => {
-  const newPlan = await instance.plans.create({
-    period: 'monthly',
-    interval: 1,
-    item: {
-      name: name,
-      description: description,
-      amount: _l.parseInt(toString(amount * 100)),
-      currency: 'INR',
-    },
-    notes: {
-      notes_key_1: 'This is for mounthluy subcription',
-    },
-  });
-  return newPlan.id;
-};
+// export const createPlan = async ({
+//   name,
+//   description,
+//   amount,
+// }: {
+//   name: string;
+//   description: string;
+//   amount: number;
+// }) => {
+//   const newPlan = await instance.plans.create({
+//     period: 'monthly',
+//     interval: 1,
+//     item: {
+//       name: name,
+//       description: description,
+//       amount: _l.parseInt(toString(amount * 100)),
+//       currency: 'INR',
+//     },
+//     notes: {
+//       notes_key_1: 'This is for mounthluy subcription',
+//     },
+//   });
+//   return newPlan.id;
+// };
 export const createNewSubcription = async ({
   planId,
   phoneNo,

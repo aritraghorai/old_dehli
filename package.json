@@ -1,8 +1,8 @@
 {
   "main": "src/app.ts",
   "scripts": {
-    "dev": "npx nodemon",
-    "build": "tsc && tsc-alias",
+    "dev": "NODE_ENV=development npx nodemon",
+    "build": "NODE_ENV=production tsc && tsc-alias",
     "start": "npm run build && node dist/app.js",
     "typeorm": "typeorm-ts-node-esm",
     "migration:generate": "typeorm-ts-node-esm -d src/utils/app-data-source.ts migration:generate",

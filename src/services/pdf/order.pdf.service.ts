@@ -1,4 +1,4 @@
-import { Order } from '@/entities/order.entity.ts';
+import { Order } from '@/entities/order.entity.js';
 import PDFDocument from 'pdfkit';
 import path from 'path';
 
@@ -49,10 +49,10 @@ function generateCustomerInformation(doc: PDFKit.PDFDocument, order: Order) {
     .text(order.orderAddress.address, 400, customerInformationTop + 15)
     .text(
       order.orderAddress.city +
-      ', ' +
-      order.orderAddress.state +
-      ', ' +
-      order.orderAddress.pincode.pincode,
+        ', ' +
+        order.orderAddress.state +
+        ', ' +
+        order.orderAddress.pincode.pincode,
       400,
       customerInformationTop + 30,
     )

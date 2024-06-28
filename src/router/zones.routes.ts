@@ -1,9 +1,9 @@
 import extractUser from '@/controller/extractUser.js';
 import zonesController from '@/controller/zones.controller.js';
 import ValidateRequestNew from '@/middleware/ValidateRequestNew.js';
-import restrictUser from '@/middleware/restrictUser.middleware.ts';
-import { uploadExcel } from '@/middleware/uploadFile.middleware.ts';
-import { ROLES } from '@/utils/Constant.ts';
+import restrictUser from '@/middleware/restrictUser.middleware.js';
+import { uploadExcel } from '@/middleware/uploadFile.middleware.js';
+import { ROLES } from '@/utils/Constant.js';
 import { praramIdValidator } from '@/validator/common.validator.js';
 import { NewZoneValidator } from '@/validator/zones.validator.js';
 import { Router } from 'express';
