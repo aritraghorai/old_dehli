@@ -5,7 +5,7 @@ const fileType = env.NODE_ENV === 'development' ? 'ts' : 'js';
 
 const filePath = env.NODE_ENV === 'development' ? 'src' : 'dist';
 
-console.log(filePath, fileType);
+console.log('filePath', filePath);
 
 export const myDataSource = new DataSource({
   type: 'postgres',

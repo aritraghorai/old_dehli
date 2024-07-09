@@ -5,8 +5,8 @@
     "build": "NODE_ENV=production tsc && tsc-alias",
     "start": "npm run build && node dist/app.js",
     "typeorm": "typeorm-ts-node-esm",
-    "migration:generate": "typeorm-ts-node-esm -d src/utils/app-data-source.ts migration:generate",
-    "migration:run": "typeorm-ts-node-esm -d src/utils/app-data-source.ts migration:run",
+    "migration:generate": "NODE_ENV=development typeorm-ts-node-esm -d src/utils/app-data-source.ts migration:generate",
+    "migration:run": "NODE_ENV=development typeorm-ts-node-esm -d src/utils/app-data-source.ts migration:run",
     "email": "email dev"
   },
   "type": "module",
