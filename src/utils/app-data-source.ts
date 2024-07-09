@@ -1,9 +1,9 @@
 import { DataSource } from 'typeorm';
 import env from './env.js';
 
-const fileType = env.NODE_ENV === 'development' ? 'ts' : 'js';
+const fileType = env.NODE_ENV === 'development' ? 'ts' : 'ts';
 
-const filePath = env.NODE_ENV === 'development' ? 'src' : 'dist';
+const filePath = env.NODE_ENV === 'development' ? 'src' : 'src';
 
 console.log('filePath', filePath);
 
