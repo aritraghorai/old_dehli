@@ -55,7 +55,6 @@ const getAllProduct = catchAsync(
         productItems: true,
         type: true,
         timeSlot: true,
-        allowZones: true,
       },
     });
     res.status(200).json({
@@ -82,7 +81,6 @@ const getAllProductAdmin = catchAsync(
         productItems: true,
         type: true,
         timeSlot: true,
-        allowZones: true,
       },
       order: {
         priority: 'DESC',
