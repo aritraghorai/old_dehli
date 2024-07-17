@@ -94,7 +94,12 @@ const updateCatagory = catchAsync(
   ) => {
     const { id } = req.params;
     const { name, description, slug, parentCategoryId, image } = req.body;
-    const catagory = await Category.findOneById(id);
+    const catagory = await Category.findOne({
+      where: { id },
+      relations: {
+        image: true,
+      },
+    });
     if (!catagory) {
       return res.status(404).json({
         status: false,
@@ -110,7 +115,7 @@ const updateCatagory = catchAsync(
       if (!imageObj) {
         throw new AppError('Image not found', 404);
       }
-      await imageController.deleteImage(catagory.image.id);
+      if (catagory.image) await imageController.deleteImage(catagory.image.id);
       catagory.image = imageObj;
     }
 
