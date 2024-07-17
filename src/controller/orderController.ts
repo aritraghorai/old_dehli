@@ -448,7 +448,12 @@ const getAllOrdersAdmin = catchAsync(async (req: Request, res: Response) => {
 const updateOrder = catchAsync(
   async (req: Request<{ id: string }, any, UpdateOrderBody>, res: Response) => {
     const orderRepo = myDataSource.getRepository(Order);
-    const order = await orderRepo.findOne({ where: { id: req.params.id } });
+    const order = await orderRepo.findOne({
+      where: { id: req.params.id },
+      relations: {
+        user: true,
+      },
+    });
     if (!order) {
       throw new AppError('Order not found', 404);
     }
