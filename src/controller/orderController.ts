@@ -455,7 +455,8 @@ const updateOrder = catchAsync(
     order.status = req.body.status || order.status;
     order.paymentStatus = req.body.paymentStatus || order.paymentStatus;
     await orderRepo.save(order);
-    await sendOrderStatusEmail([order.user.email], order, req.body.status);
+    if (order?.user?.email)
+      await sendOrderStatusEmail([order.user.email], order, req.body.status);
     return res.status(200).json({
       status: true,
       message: 'Order updated successfully',
