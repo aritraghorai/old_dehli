@@ -397,13 +397,17 @@ const getOrders = catchAsync(
       take: limit,
       skip: (page - 1) * limit,
       relations: {
-        orderAddress: true,
+        orderAddress: {
+          pincode: true,
+        },
         orderItems: {
           productItem: {
             images: true,
           },
         },
-        billingAddress: true,
+        billingAddress: {
+          pincode: true,
+        },
         razorpayPayment: true,
       },
     });
