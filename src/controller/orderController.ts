@@ -452,6 +452,13 @@ const updateOrder = catchAsync(
       where: { id: req.params.id },
       relations: {
         user: true,
+        orderItems: {
+          productItem: true,
+        },
+        orderAddress: {
+          pincode: true,
+        },
+        billingAddress: true,
       },
     });
     if (!order) {
@@ -460,6 +467,7 @@ const updateOrder = catchAsync(
     order.status = req.body.status || order.status;
     order.paymentStatus = req.body.paymentStatus || order.paymentStatus;
     await orderRepo.save(order);
+    console.log(order.user.email);
     if (order?.user?.email)
       await sendOrderStatusEmail([order.user.email], order, req.body.status);
     return res.status(200).json({
