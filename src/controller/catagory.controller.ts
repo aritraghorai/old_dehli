@@ -1,4 +1,5 @@
 import { Category } from '@/entities/category.entity.js';
+import { Image } from '@/entities/image.entity.js';
 import { categoryRepository } from '@/orm/datasources/index.js';
 import AppError from '@/utils/AppError.js';
 import { myDataSource } from '@/utils/app-data-source.js';
@@ -8,6 +9,8 @@ import {
   UpdateCategoryValidatorType,
 } from '@/validator/category.validator.js';
 import { NextFunction, Request, Response } from 'express';
+import imageController from './image.controller.js';
+import { tr } from '@faker-js/faker';
 
 const createCatagory = catchAsync(
   async (
@@ -15,7 +18,7 @@ const createCatagory = catchAsync(
     res: Response,
     next: NextFunction,
   ) => {
-    const { name, parentCategoryId, slug, description } = req.body;
+    const { name, parentCategoryId, slug, description, image } = req.body;
 
     //check if slug already exists
     const slugExists = await categoryRepository.findOne({
@@ -29,6 +32,15 @@ const createCatagory = catchAsync(
       slug,
       description,
     });
+
+    // Check image is exist or not
+    const imageObj = await Image.findOne({ where: { id: image } });
+
+    if (!image) {
+      throw new AppError('Image not found', 404);
+    }
+
+    NewCatagory.image = imageObj;
 
     if (parentCategoryId) {
       const findParentCategory =
@@ -51,7 +63,7 @@ const getAllCatagory = catchAsync(
     const catagory = await myDataSource.manager
       .getTreeRepository(Category)
       .findTrees({
-        relations: ['parent'],
+        relations: ['parent', 'image'],
       });
     return res.status(200).json({
       status: true,
@@ -65,6 +77,7 @@ const getAllCatagoryAll = catchAsync(
       relations: {
         subCategories: true,
         parent: true,
+        image: true,
       },
     });
     return res.status(200).json({
@@ -80,7 +93,7 @@ const updateCatagory = catchAsync(
     res: Response,
   ) => {
     const { id } = req.params;
-    const { name, description, slug, parentCategoryId } = req.body;
+    const { name, description, slug, parentCategoryId, image } = req.body;
     const catagory = await Category.findOneById(id);
     if (!catagory) {
       return res.status(404).json({
@@ -91,6 +104,15 @@ const updateCatagory = catchAsync(
     catagory.name = name || catagory.name;
     catagory.description = description || catagory.description;
     catagory.slug = slug || catagory.slug;
+
+    if (image) {
+      const imageObj = await Image.findOne({ where: { id: image } });
+      if (!imageObj) {
+        throw new AppError('Image not found', 404);
+      }
+      await imageController.deleteImage(catagory.image.id);
+      catagory.image = imageObj;
+    }
 
     if (parentCategoryId) {
       const findParentCategory =

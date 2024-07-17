@@ -5,6 +5,7 @@ export const NewCategoryValidator = z.object({
   slug: z.string().min(3).max(255),
   description: z.string().min(3).max(255).optional(),
   parentCategoryId: z.string().uuid().optional(),
+  image: z.string(),
 });
 
 export const UpdateCategoryValidator = z.object({
@@ -12,6 +13,7 @@ export const UpdateCategoryValidator = z.object({
   slug: z.string().min(3).max(255).optional(),
   description: z.string().min(3).max(255).optional(),
   parentCategoryId: z.string().uuid().optional(),
+  image: z.string().optional(),
 });
 
 export type UpdateCategoryValidatorType = z.infer<
