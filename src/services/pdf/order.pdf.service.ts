@@ -84,7 +84,9 @@ function generateInvoiceTable(doc: PDFKit.PDFDocument, order: Order) {
     generateTableRow(
       doc,
       position,
-      item.productItem.product.name,
+      item.productItem.product.name.length > 20
+        ? item.productItem.product.name.substring(0, 25) + '...'
+        : item.productItem.product.name,
       item.productItem.product.description.substring(0, 25),
       formatCurrency(item.productItem.price),
       item.quantity,
