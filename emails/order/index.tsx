@@ -12,11 +12,13 @@ import {
   Text,
 } from '@react-email/components';
 import * as React from 'react';
+import { Button } from '@react-email/components';
 
 import { Order } from '../../src/entities/order.entity.js';
 import { order } from './data.js';
 
-const baseUrl = `https://iamag.duckdns.org`;
+const baseUrl = `https://api.mountainroots.co.in`;
+// const baseUrl = `http://localhost:3001`;
 
 interface Order_EmailProps {
   order: Order;
@@ -55,16 +57,17 @@ export const Order_Email = ({ order, status }: Order_EmailProps) => (
 
                 <Row>
                   <Column style={informationTableColumn}>
-                    <Text style={informationTableLabel}>ORDER ID</Text>
                     <Link
                       href={`${baseUrl}/order/pdf/${order.id}`}
                       style={{
-                        ...informationTableValue,
-                        color: '#15c',
-                        textDecoration: 'underline',
+                        color: 'white',
+                        padding: '10px 20px',
+                        backgroundColor: 'red',
+                        borderRadius: '5px',
+                        cursor: 'pointer',
                       }}
                     >
-                      {order.id}
+                      Download Pdf
                     </Link>
                   </Column>
                 </Row>
@@ -89,6 +92,27 @@ export const Order_Email = ({ order, status }: Order_EmailProps) => (
           <Text style={productsTitle}>Old Dehli Store</Text>
         </Section>
         <Section>
+          <Row>
+            <Column
+              style={{
+                width: '64px',
+                alignItems: 'center',
+                marginLeft: '10px',
+              }}
+            >
+              <Text style={{ ...productTitle }}></Text>
+            </Column>
+            <Column style={{ marginLeft: '10px' }} align="right">
+              <Text style={{ ...productPrice, paddingLeft: '10px' }}>
+                Quantity
+              </Text>
+            </Column>
+
+            <Column style={productPriceWrapper} align="right">
+              <Text style={productPrice}>Price</Text>
+            </Column>
+          </Row>
+
           {order.orderItems.map(ele => (
             <Row>
               <Column style={{ width: '64px' }}>
@@ -117,6 +141,9 @@ export const Order_Email = ({ order, status }: Order_EmailProps) => (
                 {/* > */}
                 {/*   Report a Problem */}
                 {/* </Link> */}
+              </Column>
+              <Column style={productPriceWrapper} align="right">
+                <Text style={productPrice}>{ele.quantity}</Text>
               </Column>
 
               <Column style={productPriceWrapper} align="right">
@@ -158,6 +185,37 @@ export const Order_Email = ({ order, status }: Order_EmailProps) => (
             </Column>
           </Row>
         </Section>
+        <Hr style={{}} />
+        <Section align="center">
+          <Row align="center">
+            <Column style={{}}>
+              <Row>
+                <Text style={heading}>Billing Address</Text>
+                <Text style={NormalText}>
+                  {order.billingAddress.name},{order.billingAddress.landmark},
+                  {order.billingAddress.city},
+                  {order.billingAddress.pincode.pincode},
+                  {order.billingAddress.state}
+                </Text>
+              </Row>
+            </Column>
+          </Row>
+        </Section>
+        <Hr style={{}} />
+        <Section align="center">
+          <Row align="center">
+            <Column style={{}}>
+              <Row>
+                <Text style={heading}>Shipping Address</Text>
+                <Text style={NormalText}>
+                  {order.orderAddress.name},{order.orderAddress.landmark},
+                  {order.orderAddress.city},{order.orderAddress.pincode.pincode}
+                  ,{order.orderAddress.state}
+                </Text>
+              </Row>
+            </Column>
+          </Row>
+        </Section>
         <Hr style={productPriceLineBottom} />
         <Section>
           <Row>
@@ -166,7 +224,7 @@ export const Order_Email = ({ order, status }: Order_EmailProps) => (
                 src={`${baseUrl}/static/images/old_dehli.png`}
                 width="60"
                 height="60"
-                alt="Apple Card"
+                alt="old_dehli"
               />
             </Column>
           </Row>
@@ -175,6 +233,36 @@ export const Order_Email = ({ order, status }: Order_EmailProps) => (
           Copyright © 2023 Old Dehli <br />{' '}
           {/* <Link href="https://www.apple.com/legal/">All rights reserved</Link> */}
         </Text>
+        <Section>
+          <Row>
+            <Column align="center" style={block}>
+              <Text
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  justifyContent: 'center',
+                }}
+              >
+                Contact Us On{' '}
+                <Link
+                  href="https://wa.link/fx1qa0"
+                  style={{ display: 'inline' }}
+                >
+                  <Img
+                    src={`${baseUrl}/static/images/whatapp.png`}
+                    style={{
+                      cursor: 'pointer',
+                    }}
+                    width="20"
+                    height="20"
+                    alt="What app"
+                  />
+                </Link>
+              </Text>
+            </Column>
+          </Row>
+        </Section>
       </Container>
     </Body>
   </Html>
@@ -208,9 +296,9 @@ const container = {
 const tableCell = { display: 'table-cell' };
 
 const heading = {
-  fontSize: '32px',
-  fontWeight: '300',
-  color: '#888888',
+  fontSize: '20px',
+  fontWeight: '400',
+  color: '#000',
 };
 
 const informationTable = {
@@ -276,6 +364,10 @@ const productPriceTotal = {
   fontWeight: '600',
   padding: '0px 30px 0px 0px',
   textAlign: 'right' as const,
+};
+
+const NormalText = {
+  margin: '0',
 };
 
 const productPrice = {
