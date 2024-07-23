@@ -462,7 +462,9 @@ const updateOrder = catchAsync(
         orderAddress: {
           pincode: true,
         },
-        billingAddress: true,
+        billingAddress: {
+          pincode: true,
+        },
       },
     });
     if (!order) {
@@ -556,7 +558,9 @@ const getOrderInVoice = catchAsync(
         orderAddress: {
           pincode: true,
         },
-        billingAddress: true,
+        billingAddress: {
+          pincode: true,
+        },
         user: true,
       },
     });
