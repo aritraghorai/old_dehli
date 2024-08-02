@@ -69,7 +69,7 @@ const cloudinaryStorage = new CloudinaryStorage({
   cloudinary: v2,
   params: {
     public_id: (req, file) => v4(),
-    resource_type: 'video',
+    // resource_type: 'video,image',
   } as any,
 });
 
@@ -106,10 +106,15 @@ export const uploadVideo = multer({
       ext !== '.flv' &&
       ext !== '.wmv' &&
       ext !== '.mov' &&
-      ext !== '.webm'
+      ext !== '.webm' &&
+      ext !== '.png' &&
+      ext !== '.jpg' &&
+      ext !== '.gif' &&
+      ext !== '.jpeg' &&
+      ext !== '.webp'
     ) {
       return cb(
-        new AppError('Only video files are allowed!', 300) as any,
+        new AppError('Only video and image files are allowed!', 300) as any,
         false,
       );
     }
