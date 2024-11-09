@@ -115,15 +115,15 @@ export const Order_Email = ({ order, status }: Order_EmailProps) => (
 
           {order.orderItems.map(ele => (
             <Row>
-              <Column style={{ width: '64px' }}>
-                <Img
-                  src={`${ele.productItem.images[0].url}`}
-                  width="64"
-                  height="64"
-                  alt="HBO Max"
-                  style={productIcon}
-                />
-              </Column>
+              {/* <Column style={{ width: '64px' }}> */}
+              {/*   <Img */}
+              {/*     src={`${ele.productItem.images[0].url}`} */}
+              {/*     width="64" */}
+              {/*     height="64" */}
+              {/*     alt="HBO Max" */}
+              {/*     style={productIcon} */}
+              {/*   /> */}
+              {/* </Column> */}
               <Column style={{ paddingLeft: '22px' }}>
                 <Text style={productTitle}>{ele.productItem.product.name}</Text>
                 {/* <Link */}
