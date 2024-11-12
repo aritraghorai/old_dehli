@@ -1,10 +1,10 @@
-import AppError from "@/utils/AppError.js";
-import env from "@/utils/env.js";
-import Log from "@/utils/log.js";
-import { Request, Response, NextFunction } from "express";
-import multer from "multer";
+import AppError from '@/utils/AppError.js';
+import env from '@/utils/env.js';
+import Log from '@/utils/log.js';
+import { Request, Response, NextFunction } from 'express';
+import multer from 'multer';
 
-const NODE_ENV = env.NODE_ENV
+const NODE_ENV = env.NODE_ENV;
 
 const sentErrorDev = (err: AppError, res: Response) => {
   Log.error(err);
@@ -23,7 +23,7 @@ const sentErrorProd = (err: AppError, res: Response) => {
   else
     res.status(500).json({
       status: false,
-      message: "Something Happen Very Wrong",
+      message: 'Something Happen Very Wrong',
     });
 };
 //*This Method for handle cast errror
@@ -41,15 +41,15 @@ const handleValidationError = (err: any) => {
   const errors = Object.values(err.errors).map((item: any) => {
     return item.message;
   });
-  const message = `Invlid Inpur Data ${errors.join(".")}`;
+  const message = `Invlid Inpur Data ${errors.join('.')}`;
   return new AppError(message, 400);
 };
 //*Invalid Jwt token error
 const handleJWTTokenError = () =>
-  new AppError("Invalid Token Please Login agaim", 401);
+  new AppError('Invalid Token Please Login agaim', 401);
 //*Handle Invalid Token error
 const handleTokenExpireError = () =>
-  new AppError("Token Has Been Invalid", 401);
+  new AppError('Token Has Been Invalid', 401);
 
 //*Global Error Handler
 export default function globalErrorHandler(
@@ -59,31 +59,30 @@ export default function globalErrorHandler(
   next: NextFunction,
 ) {
   err.statusCode = err.statusCode || 500;
-  err.status = err.status || "error";
+  err.status = err.status || 'error';
 
- 
   Log.error(err);
 
-  if (NODE_ENV === "development") {
+  if (NODE_ENV === 'development') {
     sentErrorDev(err, res);
   } else {
     //*Mongose find method object error
     //*reference:https://github.com/Automattic/mongoose/issues/5354
 
     let error = { ...err };
-    if (err.name === "CastError" || err.name === "BSONTypeError") {
+    if (err.name === 'CastError' || err.name === 'BSONTypeError') {
       error = handleCaseError(error);
     }
     if (err.code === 11000) {
       error = handleDuplicateFieldsDb(error);
     }
-    if (err.name === "ValidationError") {
+    if (err.name === 'ValidationError') {
       error = handleValidationError(error);
     }
-    if (err.name === "JsonWebTokenError") {
+    if (err.name === 'JsonWebTokenError') {
       error = handleJWTTokenError();
     }
-    if (err.name === "TokenExpiredError") error = handleTokenExpireError();
+    if (err.name === 'TokenExpiredError') error = handleTokenExpireError();
     sentErrorProd(error, res);
   }
 
@@ -96,10 +95,9 @@ export const fileUploadErrorHander = (
   res: Response,
   next: NextFunction,
 ) => {
-  if (err instanceof multer.MulterError && err.code === "LIMIT_FILE_SIZE") {
-    return next(new AppError("File too large", 400));
+  if (err instanceof multer.MulterError && err.code === 'LIMIT_FILE_SIZE') {
+    return next(new AppError('File too large', 400));
   } else {
     next(err);
   }
 };
-

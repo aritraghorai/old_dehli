@@ -28,7 +28,7 @@ export interface multerFile {
 export type multerFiledType = { [fieldname: string]: multerFile[] };
 
 const fileSize = 1024 * 1024 * 1; // 5MB
-const videoSize = 1024 * 1024 * 10; // 10MB
+const videoSize = 1024 * 1024 * 50; // 50MB
 const excelSize = 1024 * 1024 * 25; // 25MB
 
 const storage = multer.diskStorage({
@@ -69,7 +69,7 @@ const cloudinaryStorage = new CloudinaryStorage({
   cloudinary: v2,
   params: {
     public_id: (req, file) => v4(),
-    // resource_type: 'video,image',
+    resource_type: 'auto',
   } as any,
 });
 
