@@ -16,6 +16,7 @@ import { Button } from '@react-email/components';
 
 import { Order } from '../../src/entities/order.entity.js';
 import { order } from './data.js';
+import { SingleColumn, TripleColumn } from 'responsive-react-email';
 
 const baseUrl = `https://api.mountainroots.co.in`;
 // const baseUrl = `http://localhost:3001`;
@@ -95,58 +96,68 @@ export const Order_Email = ({ order, status }: Order_EmailProps) => (
           <Row>
             <Column
               style={{
-                width: '64px',
+                width: '40%',
                 alignItems: 'center',
-                marginLeft: '10px',
               }}
             >
               <Text style={{ ...productTitle }}></Text>
             </Column>
-            <Column style={{ marginLeft: '10px' }} align="right">
+            <Column style={{ width: '20%' }} align="left">
+              <Text style={{ ...productPrice }}>Weight (gram)</Text>
+            </Column>
+
+            <Column style={{ width: '20%' }} align="right">
               <Text style={{ ...productPrice, paddingLeft: '10px' }}>
                 Quantity
               </Text>
             </Column>
 
-            <Column style={productPriceWrapper} align="right">
+            <Column
+              style={{ ...productPriceWrapper, width: '20%' }}
+              align="right"
+            >
               <Text style={productPrice}>Price</Text>
             </Column>
           </Row>
 
           {order.orderItems.map(ele => (
             <Row>
-              {/* <Column style={{ width: '64px' }}> */}
-              {/*   <Img */}
-              {/*     src={`${ele.productItem.images[0].url}`} */}
-              {/*     width="64" */}
-              {/*     height="64" */}
-              {/*     alt="HBO Max" */}
-              {/*     style={productIcon} */}
-              {/*   /> */}
-              {/* </Column> */}
-              <Column style={{ paddingLeft: '22px' }}>
+              <Column style={{ width: '40%' }}>
                 <Text style={productTitle}>{ele.productItem.product.name}</Text>
-                {/* <Link */}
-                {/*   href="https://userpub.itunes.apple.com/WebObjects/MZUserPublishing.woa/wa/addUserReview?cc=us&amp;id=1497977514&amp;o=i&amp;type=Subscription%20Renewal" */}
-                {/*   style={productLink} */}
-                {/*   data-saferedirecturl="https://www.google.com/url?q=https://userpub.itunes.apple.com/WebObjects/MZUserPublishing.woa/wa/addUserReview?cc%3Dus%26id%3D1497977514%26o%3Di%26type%3DSubscription%2520Renewal&amp;source=gmail&amp;ust=1673963081204000&amp;usg=AOvVaw2DFCLKMo1snS-Swk5H26Z1" */}
-                {/* > */}
-                {/*   Write a Review */}
-                {/* </Link> */}
-                {/* <span style={divisor}>|</span> */}
-                {/* <Link */}
-                {/*   href="https://buy.itunes.apple.com/WebObjects/MZFinance.woa/wa/reportAProblem?a=1497977514&amp;cc=us&amp;d=683263808&amp;o=i&amp;p=29065684906671&amp;pli=29092219632071&amp;s=1" */}
-                {/*   style={productLink} */}
-                {/*   data-saferedirecturl="https://www.google.com/url?q=https://buy.itunes.apple.com/WebObjects/MZFinance.woa/wa/reportAProblem?a%3D1497977514%26cc%3Dus%26d%3D683263808%26o%3Di%26p%3D29065684906671%26pli%3D29092219632071%26s%3D1&amp;source=gmail&amp;ust=1673963081204000&amp;usg=AOvVaw3y47L06B2LTrL6qsmaW2Hq" */}
-                {/* > */}
-                {/*   Report a Problem */}
-                {/* </Link> */}
               </Column>
-              <Column style={productPriceWrapper} align="right">
+              <Column
+                style={{
+                  ...productPriceWrapper,
+                  width: '20%',
+                }}
+                align="left"
+              >
+                <Text
+                  style={{
+                    ...productPriceWrapper,
+                  }}
+                >
+                  {ele.productItem.weight * ele.quantity}
+                </Text>
+              </Column>
+
+              <Column
+                style={{
+                  ...productPriceWrapper,
+                  width: '20%',
+                }}
+                align="right"
+              >
                 <Text style={productPrice}>{ele.quantity}</Text>
               </Column>
 
-              <Column style={productPriceWrapper} align="right">
+              <Column
+                style={{
+                  ...productPriceWrapper,
+                  width: '20%',
+                }}
+                align="right"
+              >
                 <Text style={productPrice}>Rs.{ele.price}</Text>
               </Column>
             </Row>
@@ -387,7 +398,6 @@ const productPriceLarge = {
 const productPriceWrapper = {
   display: 'table-cell',
   padding: '0px 20px 0px 0px',
-  width: '100px',
   verticalAlign: 'top',
 };
 
