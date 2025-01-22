@@ -174,8 +174,12 @@ function generateHr(doc, y) {
   doc.strokeColor('#aaaaaa').lineWidth(1).moveTo(50, y).lineTo(550, y).stroke();
 }
 
+const currencyFormatter = new Intl.NumberFormat('en-IN', {
+  maximumFractionDigits: 3,
+});
+
 function formatCurrency(cents) {
-  return 'Rs. ' + (cents / 100).toFixed(2);
+  return 'Rs. ' + currencyFormatter.format(cents);
 }
 
 function formatDate(date: Date) {
