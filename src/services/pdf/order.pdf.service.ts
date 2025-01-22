@@ -95,31 +95,66 @@ function generateInvoiceTable(doc: PDFKit.PDFDocument, order: Order) {
   }
 
   const subtotalPosition = invoiceTableTop + (i + 1) * 30;
-  generateTableRow(
-    doc,
-    subtotalPosition,
-    '',
-    'Subtotal',
-    '',
-    formatCurrency(order.grandTotal + order.deliveryCharge),
-  );
-  generateTableRow(
-    doc,
-    subtotalPosition + 15,
-    '',
-    'DeliveryCharge',
-    '',
-    formatCurrency(order.deliveryCharge),
-  );
+  // generateTableRow(
+  //   doc,
+  //   subtotalPosition,
+  //   '',
+  //   'Subtotal',
+  //   '',
+  //   formatCurrency(order.grandTotal + order.deliveryCharge),
+  // );
+  let y = subtotalPosition;
 
-  generateTableRow(
-    doc,
-    subtotalPosition + 30,
-    '',
-    'GrandTotal',
-    '',
-    formatCurrency(order.deliveryCharge + order.grandTotal),
-  );
+  doc
+    .fontSize(10)
+    .text('', 50, subtotalPosition + 15)
+    .font('Helvetica-Bold')
+    .text('Subtotal', 200, y)
+    // .text(unitCost, 280, y, { width: 90, align: 'right' })
+    .text('', 370, y, { width: 90, align: 'right' })
+    .font('Helvetica')
+    .text(formatCurrency(order.grandTotal), 0, y, { align: 'right' });
+
+  y = subtotalPosition + 15;
+  doc
+    .fontSize(10)
+    .text('', 50, subtotalPosition + 15)
+    .font('Helvetica-Bold')
+    .text('Delivery Charge', 200, y)
+    // .text(unitCost, 280, y, { width: 90, align: 'right' })
+    .text('', 370, y, { width: 90, align: 'right' })
+    .font('Helvetica')
+    .text(formatCurrency(order.deliveryCharge), 0, y, { align: 'right' });
+
+  // generateTableRow(
+  //   doc,
+  //   subtotalPosition + 15,
+  //   '',
+  //   'DeliveryCharge',
+  //   '',
+  //   formatCurrency(order.deliveryCharge),
+  // );
+  y = subtotalPosition + 30;
+  doc
+    .fontSize(10)
+    .text('', 50, subtotalPosition + 15)
+    .font('Helvetica-Bold')
+    .text('Grand Total', 200, y)
+    // .text(unitCost, 280, y, { width: 90, align: 'right' })
+    .text('', 370, y, { width: 90, align: 'right' })
+    .font('Helvetica')
+    .text(formatCurrency(order.deliveryCharge + order.grandTotal), 0, y, {
+      align: 'right',
+    });
+
+  // generateTableRow(
+  //   doc,
+  //   subtotalPosition + 30,
+  //   '',
+  //   'GrandTotal',
+  //   '',
+  //   formatCurrency(order.deliveryCharge + order.grandTotal),
+  // );
 
   const paidToDatePosition = subtotalPosition + 20;
   // generateTableRow(
