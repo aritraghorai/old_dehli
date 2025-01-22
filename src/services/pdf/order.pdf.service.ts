@@ -70,10 +70,9 @@ function generateInvoiceTable(doc: PDFKit.PDFDocument, order: Order) {
     doc,
     invoiceTableTop,
     'Item',
-    'Description',
-    'Unit Cost',
+    'Weight(gram)',
     'Quantity',
-    'Line Total',
+    'Price',
   );
   generateHr(doc, invoiceTableTop + 20);
   doc.font('Helvetica');
@@ -84,11 +83,10 @@ function generateInvoiceTable(doc: PDFKit.PDFDocument, order: Order) {
     generateTableRow(
       doc,
       position,
-      item.productItem.product.name.length > 15
-        ? item.productItem.product.name.substring(0, 15) + '...'
+      item.productItem.product.name.length > 30
+        ? item.productItem.product.name.substring(0, 30) + '...'
         : item.productItem.product.name,
-      item.productItem.product.description.substring(0, 15),
-      formatCurrency(item.productItem.price),
+      String(item.productItem.weight),
       item.quantity,
       formatCurrency(item.price * item.quantity),
     );
@@ -101,10 +99,26 @@ function generateInvoiceTable(doc: PDFKit.PDFDocument, order: Order) {
     doc,
     subtotalPosition,
     '',
-    '',
     'Subtotal',
     '',
-    formatCurrency(order.grandTotal + order.deliveryCharge),
+    formatCurrency(order.grandTotal),
+  );
+  generateTableRow(
+    doc,
+    subtotalPosition + 15,
+    '',
+    'DeliveryCharge',
+    '',
+    formatCurrency(order.deliveryCharge),
+  );
+
+  generateTableRow(
+    doc,
+    subtotalPosition + 30,
+    '',
+    'GrandTotal',
+    '',
+    formatCurrency(order.deliveryCharge + order.grandTotal),
   );
 
   const paidToDatePosition = subtotalPosition + 20;
@@ -142,17 +156,16 @@ function generateFooter(doc: PDFKit.PDFDocument) {
 function generateTableRow(
   doc: PDFKit.PDFDocument,
   y: number,
-  item,
-  description,
-  unitCost,
+  item: string,
+  weight: string,
   quantity,
   lineTotal,
 ) {
   doc
     .fontSize(10)
     .text(item, 50, y)
-    .text(description, 150, y)
-    .text(unitCost, 280, y, { width: 90, align: 'right' })
+    .text(weight, 200, y)
+    // .text(unitCost, 280, y, { width: 90, align: 'right' })
     .text(quantity, 370, y, { width: 90, align: 'right' })
     .text(lineTotal, 0, y, { align: 'right' });
 }
