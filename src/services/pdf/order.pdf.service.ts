@@ -19,9 +19,9 @@ function generateHeader(doc: PDFKit.PDFDocument) {
     .fontSize(20)
     .text('Old Dehli', 110, 57)
     .fontSize(10)
-    .text('ACME Inc.', 200, 50, { align: 'right' })
-    .text('123 Main Street', 200, 65, { align: 'right' })
-    .text('New York, NY, 10025', 200, 80, { align: 'right' })
+    .text('151 – A, Club Road,', 200, 50, { align: 'right' })
+    .text('Sainik Farm,', 200, 65, { align: 'right' })
+    .text('New Delhi -110062, India', 200, 80, { align: 'right' })
     .moveDown();
 }
 
@@ -182,10 +182,26 @@ function generateInvoiceTable(doc: PDFKit.PDFDocument, order: Order) {
 }
 
 function generateFooter(doc: PDFKit.PDFDocument) {
-  doc.fontSize(10).text('Thank you for your business.', 50, 780, {
+  doc.fontSize(10).text('Thank you for your business.', 50, 730, {
     align: 'center',
     width: 500,
   });
+
+  // Contact information
+  doc
+    .fontSize(10)
+    .text('Get in Touch', 50, 745, {
+      align: 'center',
+      width: 500,
+    })
+    .text('Call Us: +917289938122', 50, 760, {
+      align: 'center',
+      width: 500,
+    })
+    .text('Email Us: info@olddelhifoods.com', 50, 775, {
+      align: 'center',
+      width: 500,
+    });
 }
 
 function generateTableRow(
