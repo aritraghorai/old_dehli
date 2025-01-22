@@ -566,7 +566,7 @@ const getOrderInVoice = catchAsync(
     });
     const pdf = orderPdfService.createInvoice(order);
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `inline; filename=${order.id}.pdf`);
+    res.setHeader('Content-Disposition', `inline; filename=invoice.pdf`);
     pdf.pipe(res);
     pdf.end();
   },
