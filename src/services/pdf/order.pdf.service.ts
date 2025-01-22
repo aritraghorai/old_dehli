@@ -101,7 +101,7 @@ function generateInvoiceTable(doc: PDFKit.PDFDocument, order: Order) {
     '',
     'Subtotal',
     '',
-    formatCurrency(order.grandTotal),
+    formatCurrency(order.grandTotal + order.deliveryCharge),
   );
   generateTableRow(
     doc,
