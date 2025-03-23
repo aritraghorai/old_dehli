@@ -20,7 +20,7 @@ import {
   UpdateProductRequestBody,
 } from '@/validator/product.validator.js';
 import { NextFunction, Request, Response } from 'express';
-import { In, Like, MoreThan } from 'typeorm';
+import { In, Like, MoreThan, ILike } from 'typeorm';
 
 const getAllProduct = catchAsync(
   async (
@@ -34,27 +34,27 @@ const getAllProduct = catchAsync(
       take: limit,
       where: [
         search && {
-          name: search ? Like(`%${search}%`) : Like(`%%`),
+          name: search ? ILike(`%${search}%`) : ILike(`%%`),
           productItems: MoreThan(0),
           isActive: true,
         },
         category && {
           category: {
-            slug: category ? Like(`%${category}%`) : Like(`%%`),
+            slug: category ? ILike(`%${category}%`) : ILike(`%%`),
           },
           productItems: MoreThan(0),
           isActive: true,
         },
         shop && {
           shop: {
-            slug: shop ? Like(`%${shop}%`) : Like(`%%`),
+            slug: shop ? ILike(`%${shop}%`) : ILike(`%%`),
             isActive: true,
           },
           productItems: MoreThan(0),
           isActive: true,
         },
         search && {
-          slug: search ? Like(`%${search}%`) : Like(`%%`),
+          slug: search ? ILike(`%${search}%`) : ILike(`%%`),
           productItems: MoreThan(0),
           isActive: true,
         },
