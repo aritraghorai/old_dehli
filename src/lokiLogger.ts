@@ -4,7 +4,7 @@ import LokiTransport from 'winston-loki';
 const lokiTransport = new LokiTransport({
   host: 'https://loki.dev.aritraghorai.in', // Default Loki server URL
   labels: {
-    app: 'node-express-app-local',
+    app: 'old_dehli_backend',
     environment: process.env.NODE_ENV || 'development',
   },
   json: true,

@@ -12,7 +12,13 @@ const app = express();
 
 process.env.TZ = 'Asia/Calcutta';
 
-app.use(morgan('dev'));
+app.use(
+  morgan('common', {
+    stream: {
+      write: message => console.log(message.trim()),
+    },
+  }),
+);
 
 app.use(cors());
 
