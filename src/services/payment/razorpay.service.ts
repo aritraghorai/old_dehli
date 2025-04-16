@@ -23,7 +23,7 @@ export const createOrderRazerPay = async (
 ) => {
   try {
     const res = await instance.orders.create({
-      amount: _l.parseInt(String(amount)),
+      amount: _l.parseInt(String(amount)) * 100,
       currency,
       receipt,
       partial_payment: partial_payment,
