@@ -6,6 +6,7 @@ import cors from 'cors';
 import globalErrorHandler from './controller/globarError.controller.js';
 import { myDataSource } from './utils/app-data-source.js';
 import env from './utils/env.js';
+import './lokiLogger.ts';
 
 const app = express();
 
