@@ -71,6 +71,7 @@ function generateInvoiceTable(doc: PDFKit.PDFDocument, order: Order) {
     invoiceTableTop,
     'Item',
     'Weight(gram)',
+    'Varient',
     'Quantity',
     'Price',
   );
@@ -80,6 +81,13 @@ function generateInvoiceTable(doc: PDFKit.PDFDocument, order: Order) {
   for (i = 0; i < order.orderItems.length; i++) {
     const item = order.orderItems[i];
     const position = invoiceTableTop + (i + 1) * 30;
+    let varient = '';
+    console.log(item.productItem.productConfig);
+    if (item.productItem?.productConfig?.length > 0) {
+      varient = item.productItem.productConfig
+        .map(config => config.optionValue.value)
+        .join(', ');
+    }
     generateTableRow(
       doc,
       position,
@@ -87,6 +95,7 @@ function generateInvoiceTable(doc: PDFKit.PDFDocument, order: Order) {
         ? item.productItem.product.name.substring(0, 30) + '...'
         : item.productItem.product.name,
       String(item.productItem.weight),
+      varient,
       item.quantity,
       formatCurrency(item.price * item.quantity),
     );
@@ -209,6 +218,7 @@ function generateTableRow(
   y: number,
   item: string,
   weight: string,
+  varient: string,
   quantity,
   lineTotal,
 ) {
@@ -216,6 +226,7 @@ function generateTableRow(
     .fontSize(10)
     .text(item, 50, y)
     .text(weight, 200, y)
+    .text(varient || '-', 330, y, { width: 90, align: 'center' })
     // .text(unitCost, 280, y, { width: 90, align: 'right' })
     .text(quantity, 370, y, { width: 90, align: 'right' })
     .text(lineTotal, 0, y, { align: 'right' });

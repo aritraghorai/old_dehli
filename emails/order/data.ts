@@ -25,7 +25,29 @@ export const order = {
         stock: '3',
         price: 100,
         weight: 100,
-        productConfig: [],
+        productConfig: [
+          {
+            id: '94203c9c-28bf-4294-8c29-672ae84b9cfe',
+            optionValue: {
+              id: 'f01a5bf7-a916-4692-86c9-337456010169',
+              value: 'SMALL',
+              option: {
+                id: '300f30d6-a772-485f-9665-ccdbad0036cd',
+                value: 'Size',
+                createdAt: '2024-04-15T19:21:51.329Z',
+                updatedAt: '2024-04-15T19:21:51.329Z',
+              },
+              createdAt: '2024-04-15T19:21:51.334Z',
+              updatedAt: '2024-04-15T19:21:51.334Z',
+            },
+            option: {
+              id: '300f30d6-a772-485f-9665-ccdbad0036cd',
+              value: 'Size',
+              createdAt: '2024-04-15T19:21:51.329Z',
+              updatedAt: '2024-04-15T19:21:51.329Z',
+            },
+          },
+        ],
         isActive: true,
         images: [
           {

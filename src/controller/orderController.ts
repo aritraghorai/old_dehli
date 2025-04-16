@@ -360,6 +360,7 @@ const createOrder = catchAsync(
       // razorpay payment
       // create razorpay order
       // create razorpay payment
+      console.log(totalAmount + 'totalAmount');
       const razorpayOrder = await createOrderRazerPay(totalAmount, user.name, {
         orderId: newOrder.id,
         userId: user.id,
@@ -553,7 +554,12 @@ const getOrderInVoice = catchAsync(
       where: { id },
       relations: {
         orderItems: {
-          productItem: true,
+          productItem: {
+            productConfig: {
+              optionValue: true,
+              option: true,
+            },
+          },
         },
         orderAddress: {
           pincode: true,
