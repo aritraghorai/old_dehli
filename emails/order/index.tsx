@@ -16,7 +16,6 @@ import { Button } from '@react-email/components';
 
 import { Order } from '../../src/entities/order.entity.js';
 import { order } from './data.js';
-import { SingleColumn, TripleColumn } from 'responsive-react-email';
 
 const baseUrl = `https://api.mountainroots.co.in`;
 // const baseUrl = `http://localhost:3001`;
@@ -103,7 +102,7 @@ export const Order_Email = ({ order, status }: Order_EmailProps) => (
               <Text style={{ ...productTitle }}></Text>
             </Column>
             <Column style={{ width: '20%' }} align="left">
-              <Text style={{ ...productPrice }}>Weight (gram)</Text>
+              <Text style={{ ...productPrice }}>Varient</Text>
             </Column>
 
             <Column style={{ width: '20%' }} align="right">
@@ -137,7 +136,11 @@ export const Order_Email = ({ order, status }: Order_EmailProps) => (
                     ...productPriceWrapper,
                   }}
                 >
-                  {ele.productItem.weight * ele.quantity}
+                  {ele.productItem?.productConfig?.reduce((prev, curr) => {
+                    console.log(curr);
+                    const val = curr?.optionValue?.value ?? '';
+                    return prev + ' ' + val;
+                  }, '')}
                 </Text>
               </Column>
 
