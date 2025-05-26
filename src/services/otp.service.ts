@@ -4,7 +4,7 @@ import { render } from '@react-email/render';
 
 const generateOtp = () => {
   //generate 6 digit number
-  return '123456';
+  return Math.floor(100000 + Math.random() * 900000).toString();
 };
 
 const sendOtp = async (otp: string, email: string) => {
