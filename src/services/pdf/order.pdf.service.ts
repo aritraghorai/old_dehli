@@ -225,7 +225,7 @@ function generateTableRow(
   doc
     .fontSize(10)
     .text(item, 50, y)
-    .text(weight, 200, y)
+    // .text(weight, 200, y)
     .text(varient || '-', 330, y, { width: 90, align: 'center' })
     // .text(unitCost, 280, y, { width: 90, align: 'right' })
     .text(quantity, 370, y, { width: 90, align: 'right' })
