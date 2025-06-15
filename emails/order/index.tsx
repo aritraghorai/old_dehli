@@ -161,7 +161,7 @@ export const Order_Email = ({ order, status }: Order_EmailProps) => (
                 }}
                 align="right"
               >
-                <Text style={productPrice}>Rs.{ele.price}</Text>
+                <Text style={productPrice}>Rs.{ele.price * ele.quantity}</Text>
               </Column>
             </Row>
           ))}

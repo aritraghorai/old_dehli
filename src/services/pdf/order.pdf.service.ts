@@ -17,7 +17,7 @@ function generateHeader(doc: PDFKit.PDFDocument) {
     .image('logo.png', 50, 45, { width: 50 })
     .fillColor('#444444')
     .fontSize(20)
-    .text('Old Dehli', 110, 57)
+    .text('Old Dehli Foods', 110, 57)
     .fontSize(10)
     .text('151 – A, Club Road,', 200, 50, { align: 'right' })
     .text('Sainik Farm,', 200, 65, { align: 'right' })
@@ -41,7 +41,28 @@ function generateCustomerInformation(doc: PDFKit.PDFDocument, order: Order) {
     .text('Invoice Date:', 50, customerInformationTop + 15)
     .text(formatDate(new Date()), 150, customerInformationTop + 15)
     .text('Balance Due:', 50, customerInformationTop + 30)
-    .text(formatCurrency(order.grandTotal), 150, customerInformationTop + 30)
+    .text(
+      formatCurrency(order.grandTotal + order.deliveryCharge),
+      150,
+      customerInformationTop + 30,
+    )
+    .text('Delivery Date:', 50, customerInformationTop + 45)
+    .text(
+      new Date(order.orderAddress.deliveryDate).toLocaleString('en-GB', {
+        weekday: 'short',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      }),
+      150,
+      customerInformationTop + 45,
+    )
+    .text('Delivery Time:', 50, customerInformationTop + 60)
+    .text(
+      order.orderAddress.startTime + '-' + order.orderAddress.endTime,
+      150,
+      customerInformationTop + 60,
+    )
 
     .font('Helvetica-Bold')
     .text(order.orderAddress.name, 400, customerInformationTop)
@@ -52,13 +73,14 @@ function generateCustomerInformation(doc: PDFKit.PDFDocument, order: Order) {
         ', ' +
         order.orderAddress.state +
         ', ' +
-        order.orderAddress.pincode.pincode,
+        order.orderAddress.pincode.pincode +
+        '\n',
       400,
       customerInformationTop + 30,
     )
     .moveDown();
 
-  generateHr(doc, 252);
+  generateHr(doc, 274);
 }
 
 function generateInvoiceTable(doc: PDFKit.PDFDocument, order: Order) {
