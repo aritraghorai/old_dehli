@@ -17,8 +17,8 @@ import { Button } from '@react-email/components';
 import { Order } from '../../src/entities/order.entity.js';
 import { order } from './data.js';
 
+// const baseUrl = `https://api.mountainroots.co.in`;
 const baseUrl = `https://api.mountainroots.co.in`;
-// const baseUrl = `http://localhost:3001`;
 
 interface Order_EmailProps {
   order: Order;
@@ -27,255 +27,230 @@ interface Order_EmailProps {
 
 export const Order_Email = ({ order, status }: Order_EmailProps) => (
   <Html>
-    <Head />
+    <Head>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <meta httpEquiv="Content-Type" content="text/html; charset=UTF-8" />
+    </Head>
 
     <Body style={main}>
       <Container style={container}>
-        <Section>
+        {/* Header Section */}
+        <Section style={header}>
           <Row>
-            <Column>
-              <Text style={heading}>Your Order {status}</Text>
-            </Column>
-
-            <Column align="right" style={tableCell}>
-              <Text style={heading}>Receipt</Text>
+            <Column align="center">
+              <Img
+                src={`${baseUrl}/static/images/old_dehli.png`}
+                width="80"
+                height="80"
+                alt="Old Delhi Store"
+                style={logo}
+              />
+              <Text style={storeName}>Old Delhi Store</Text>
             </Column>
           </Row>
         </Section>
-        <Section style={informationTable}>
-          <Row style={informationTableRow}>
-            <Column colSpan={2}>
-              <Section>
-                <Row>
-                  <Column style={informationTableColumn}>
-                    <Text style={informationTableLabel}>INVOICE DATE</Text>
-                    <Text style={informationTableValue}>
-                      {new Date(order.createdAt).toDateString()}
-                    </Text>
-                  </Column>
-                </Row>
 
-                <Row>
-                  <Column style={informationTableColumn}>
-                    <Link
-                      href={`${baseUrl}/order/pdf/${order.id}`}
-                      style={{
-                        color: 'white',
-                        padding: '10px 20px',
-                        backgroundColor: 'red',
-                        borderRadius: '5px',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      Download Pdf
-                    </Link>
-                  </Column>
-                </Row>
-              </Section>
-            </Column>
-            {/* { */}
-            {/*   !!order.billingAddress &&            <Column style={informationTableColumn} colSpan={2}> */}
-            {/*   <Text style={informationTableLabel}>BILLED TO</Text> */}
-            {/*   <Text style={informationTableValue}> */}
-            {/*       {order.billingAddress.} */}
-            {/*   </Text> */}
-            {/*   <Text style={informationTableValue}>Alan Turing</Text> */}
-            {/*   <Text style={informationTableValue}>2125 Chestnut St</Text> */}
-            {/*   <Text style={informationTableValue}>San Francisco, CA 94123</Text> */}
-            {/*   <Text style={informationTableValue}>USA</Text> */}
-            {/* </Column> */}
-            {/**/}
-            {/* } */}
-          </Row>
+        {/* Status Banner */}
+        <Section style={statusBanner}>
+          <Text style={statusText}>Your Order has been {status}</Text>
+          <Text style={orderNumber}>
+            Order #{order.id.slice(-8).toUpperCase()}
+          </Text>
         </Section>
-        <Section style={productTitleTable}>
-          <Text style={productsTitle}>Old Dehli Store</Text>
-        </Section>
-        <Section>
+
+        {/* Order Info Card */}
+        <Section style={infoCard}>
           <Row>
-            <Column
-              style={{
-                width: '40%',
-                alignItems: 'center',
-              }}
-            >
-              <Text style={{ ...productTitle }}></Text>
-            </Column>
-            <Column style={{ width: '20%' }} align="left">
-              <Text style={{ ...productPrice }}>Varient</Text>
-            </Column>
-
-            <Column style={{ width: '20%' }} align="right">
-              <Text style={{ ...productPrice, paddingLeft: '10px' }}>
-                Quantity
+            <Column style={infoColumn}>
+              <Text style={infoLabel}>Order Date</Text>
+              <Text style={infoValue}>
+                {new Date(order.createdAt).toLocaleDateString('en-US', {
+                  weekday: 'long',
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })}
               </Text>
             </Column>
+            <Column style={infoColumn}>
+              <Text style={infoLabel}>Payment Method</Text>
+              <Text style={infoValue}>
+                {order.paymentGateway === 'CASH_ON_DELIVERY'
+                  ? 'Cash on Delivery'
+                  : order.paymentGateway}
+              </Text>
+            </Column>
+          </Row>
+          <Row style={{ marginTop: '20px' }}>
+            <Column align="center">
+              <Link
+                href={`${baseUrl}/order/pdf/${order.id}`}
+                style={downloadButton}
+              >
+                📄 Download Invoice PDF
+              </Link>
+            </Column>
+          </Row>
+        </Section>
 
-            <Column
-              style={{ ...productPriceWrapper, width: '20%' }}
-              align="right"
-            >
-              <Text style={productPrice}>Price</Text>
+        {/* Order Items */}
+        <Section style={itemsSection}>
+          <Text style={sectionTitle}>Order Items</Text>
+
+          {/* Table Header */}
+          <Row style={tableHeader}>
+            <Column style={{ width: '50%' }}>
+              <Text style={tableHeaderText}>Item</Text>
+            </Column>
+            <Column style={{ width: '15%' }} align="center">
+              <Text style={tableHeaderText}>Qty</Text>
+            </Column>
+            <Column style={{ width: '35%' }} align="right">
+              <Text style={tableHeaderText}>Price</Text>
             </Column>
           </Row>
 
-          {order.orderItems.map(ele => (
-            <Row>
-              <Column style={{ width: '40%' }}>
-                <Text style={productTitle}>{ele.productItem.product.name}</Text>
+          {/* Order Items */}
+          {order.orderItems.map((item, index) => (
+            <Row
+              key={item.id}
+              style={{
+                ...tableRow,
+                backgroundColor: index % 2 === 0 ? '#fafafa' : '#ffffff',
+              }}
+            >
+              <Column style={{ width: '50%', padding: '15px 10px' }}>
+                <Text style={itemName}>{item.productItem.product.name}</Text>
+                {item.productItem?.productConfig?.length > 0 && (
+                  <Text style={itemVariant}>
+                    {item.productItem.productConfig.reduce((prev, curr) => {
+                      const val = curr?.optionValue?.value ?? '';
+                      return prev + (prev ? ', ' : '') + val;
+                    }, '')}
+                  </Text>
+                )}
               </Column>
               <Column
-                style={{
-                  ...productPriceWrapper,
-                  width: '20%',
-                }}
-                align="left"
+                style={{ width: '15%', padding: '15px 10px' }}
+                align="center"
               >
-                <Text
-                  style={{
-                    ...productPriceWrapper,
-                  }}
-                >
-                  {ele.productItem?.productConfig?.reduce((prev, curr) => {
-                    console.log(curr);
-                    const val = curr?.optionValue?.value ?? '';
-                    return prev + ' ' + val;
-                  }, '')}
+                <Text style={itemQuantity}>{item.quantity}</Text>
+              </Column>
+              <Column
+                style={{ width: '35%', padding: '15px 10px' }}
+                align="right"
+              >
+                <Text style={itemPrice}>
+                  ₹{(item.price * item.quantity).toLocaleString()}
                 </Text>
-              </Column>
-
-              <Column
-                style={{
-                  ...productPriceWrapper,
-                  width: '20%',
-                }}
-                align="right"
-              >
-                <Text style={productPrice}>{ele.quantity}</Text>
-              </Column>
-
-              <Column
-                style={{
-                  ...productPriceWrapper,
-                  width: '20%',
-                }}
-                align="right"
-              >
-                <Text style={productPrice}>Rs.{ele.price * ele.quantity}</Text>
               </Column>
             </Row>
           ))}
         </Section>
-        <Hr style={productPriceLine} />
-        <Section align="right">
-          <Row>
-            <Column style={tableCell} align="right">
-              <Text style={productPriceTotal}>Total</Text>
+
+        {/* Order Summary */}
+        <Section style={summarySection}>
+          <Row style={summaryRow}>
+            <Column align="right" style={{ width: '70%' }}>
+              <Text style={summaryLabel}>Subtotal</Text>
             </Column>
-            <Column style={productPriceVerticalLine}></Column>
-            <Column style={productPriceLargeWrapper}>
-              <Text style={productPriceLarge}>
-                Rs.{order.grandTotal - order.deliveryCharge}
+            <Column align="right" style={{ width: '30%' }}>
+              <Text style={summaryValue}>
+                ₹{(order.grandTotal - order.deliveryCharge).toLocaleString()}
               </Text>
-            </Column>
-          </Row>
-          <Row>
-            <Column style={tableCell} align="right">
-              <Text style={productPriceTotal}>Delivery Charge</Text>
-            </Column>
-            <Column style={productPriceVerticalLine}></Column>
-            <Column style={productPriceLargeWrapper}>
-              <Text style={productPriceLarge}>Rs.{order.deliveryCharge}</Text>
             </Column>
           </Row>
 
-          <Row>
-            <Column style={tableCell} align="right">
-              <Text style={productPriceTotal}>Grand Total</Text>
+          <Row style={summaryRow}>
+            <Column align="right" style={{ width: '70%' }}>
+              <Text style={summaryLabel}>Delivery Charge</Text>
             </Column>
-            <Column style={productPriceVerticalLine}></Column>
-            <Column style={productPriceLargeWrapper}>
-              <Text style={productPriceLarge}>Rs.{order.grandTotal}</Text>
-            </Column>
-          </Row>
-        </Section>
-        <Hr style={{}} />
-        <Section align="center">
-          <Row align="center">
-            <Column style={{}}>
-              <Row>
-                <Text style={heading}>Billing Address</Text>
-                <Text style={NormalText}>
-                  {order.billingAddress.name},{order.billingAddress.landmark},
-                  {order.billingAddress.city},
-                  {order.billingAddress.pincode.pincode},
-                  {order.billingAddress.state}
-                </Text>
-              </Row>
-            </Column>
-          </Row>
-        </Section>
-        <Hr style={{}} />
-        <Section align="center">
-          <Row align="center">
-            <Column style={{}}>
-              <Row>
-                <Text style={heading}>Shipping Address</Text>
-                <Text style={NormalText}>
-                  {order.orderAddress.name},{order.orderAddress.landmark},
-                  {order.orderAddress.city},{order.orderAddress.pincode.pincode}
-                  ,{order.orderAddress.state}
-                </Text>
-              </Row>
-            </Column>
-          </Row>
-        </Section>
-        <Hr style={productPriceLineBottom} />
-        <Section>
-          <Row>
-            <Column align="center" style={block}>
-              <Img
-                src={`${baseUrl}/static/images/old_dehli.png`}
-                width="60"
-                height="60"
-                alt="old_dehli"
-              />
-            </Column>
-          </Row>
-        </Section>
-        <Text style={footerCopyright}>
-          Copyright © 2023 Old Dehli <br />{' '}
-          {/* <Link href="https://www.apple.com/legal/">All rights reserved</Link> */}
-        </Text>
-        <Section>
-          <Row>
-            <Column align="center" style={block}>
-              <Text
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '5px',
-                  justifyContent: 'center',
-                }}
-              >
-                Contact Us On{' '}
-                <Link
-                  href="https://wa.link/fx1qa0"
-                  style={{ display: 'inline' }}
-                >
-                  <Img
-                    src={`${baseUrl}/static/images/whatapp.png`}
-                    style={{
-                      cursor: 'pointer',
-                    }}
-                    width="20"
-                    height="20"
-                    alt="What app"
-                  />
-                </Link>
+            <Column align="right" style={{ width: '30%' }}>
+              <Text style={summaryValue}>
+                ₹{order.deliveryCharge.toLocaleString()}
               </Text>
             </Column>
           </Row>
+
+          <Hr style={summaryDivider} />
+
+          <Row style={summaryRow}>
+            <Column align="right" style={{ width: '70%' }}>
+              <Text style={totalLabel}>Grand Total</Text>
+            </Column>
+            <Column align="right" style={{ width: '30%' }}>
+              <Text style={totalValue}>
+                ₹{order.grandTotal.toLocaleString()}
+              </Text>
+            </Column>
+          </Row>
+        </Section>
+
+        {/* Addresses Section */}
+        <Section style={addressSection}>
+          <Row>
+            <Column style={addressColumn}>
+              <Text style={addressTitle}>🏠 Billing Address</Text>
+              <Text style={addressText}>
+                {order.billingAddress.name}
+                <br />
+                {order.billingAddress.address}
+                <br />
+                {order.billingAddress.landmark &&
+                  `${order.billingAddress.landmark}, `}
+                {order.billingAddress.city}
+                <br />
+                {order.billingAddress.state} -{' '}
+                {order.billingAddress.pincode.pincode}
+              </Text>
+            </Column>
+
+            <Column style={addressColumn}>
+              <Text style={addressTitle}>🚚 Shipping Address</Text>
+              <Text style={addressText}>
+                {order.orderAddress.name}
+                <br />
+                {order.orderAddress.address}
+                <br />
+                {order.orderAddress.landmark &&
+                  `${order.orderAddress.landmark}, `}
+                {order.orderAddress.city}
+                <br />
+                {order.orderAddress.state} -{' '}
+                {order.orderAddress.pincode.pincode}
+              </Text>
+              {order.orderAddress.deliveryDate && (
+                <Text style={deliveryInfo}>
+                  📅 Delivery:{' '}
+                  {new Date(
+                    order.orderAddress.deliveryDate,
+                  ).toLocaleDateString()}
+                  <br />
+                  🕐 Time: {order.orderAddress.startTime.toString()} -{' '}
+                  {order.orderAddress.endTime.toString()}
+                </Text>
+              )}
+            </Column>
+          </Row>
+        </Section>
+
+        {/* Footer */}
+        <Section style={footer}>
+          <Text style={footerText}>Need help? Contact us on WhatsApp</Text>
+          <Link href="https://wa.link/fx1qa0" style={whatsappButton}>
+            <Img
+              src={`${baseUrl}/static/images/whatapp.png`}
+              width="24"
+              height="24"
+              alt="WhatsApp"
+              style={{ verticalAlign: 'middle', marginRight: '8px' }}
+            />
+            Chat with us
+          </Link>
+
+          <Text style={copyright}>
+            © 2024 Old Delhi Store. All rights reserved.
+          </Text>
         </Section>
       </Container>
     </Body>
@@ -289,138 +264,275 @@ Order_Email.PreviewProps = {
   status: 'Placed',
 } as Order_EmailProps;
 
+// Styles
 const main = {
-  fontFamily: '"Helvetica Neue",Helvetica,Arial,sans-serif',
-  backgroundColor: '#ffffff',
-};
-
-const resetText = {
-  margin: '0',
-  padding: '0',
-  lineHeight: 1.4,
+  fontFamily:
+    '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif',
+  backgroundColor: '#f6f9fc',
+  margin: 0,
+  padding: 0,
 };
 
 const container = {
   margin: '0 auto',
-  padding: '20px 0 48px',
-  width: '660px',
-  maxWidth: '100%',
+  padding: '20px',
+  maxWidth: '600px',
+  backgroundColor: '#ffffff',
+  borderRadius: '12px',
+  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.07)',
 };
 
-const tableCell = { display: 'table-cell' };
+const header = {
+  textAlign: 'center' as const,
+  padding: '20px 0 30px',
+  borderBottom: '2px solid #f0f0f0',
+};
 
-const heading = {
+const logo = {
+  borderRadius: '50%',
+  border: '3px solid #e74c3c',
+};
+
+const storeName = {
+  fontSize: '28px',
+  fontWeight: '700',
+  color: '#2c3e50',
+  margin: '15px 0 0 0',
+  letterSpacing: '-0.5px',
+};
+
+const statusBanner = {
+  backgroundColor: '#27ae60',
+  padding: '25px',
+  borderRadius: '8px',
+  textAlign: 'center' as const,
+  margin: '20px 0',
+};
+
+const statusText = {
   fontSize: '20px',
-  fontWeight: '400',
-  color: '#000',
+  fontWeight: '600',
+  color: '#ffffff',
+  margin: '0 0 5px 0',
 };
 
-const informationTable = {
-  borderCollapse: 'collapse' as const,
-  borderSpacing: '0px',
-  color: 'rgb(51,51,51)',
-  backgroundColor: 'rgb(250,250,250)',
-  borderRadius: '3px',
+const orderNumber = {
+  fontSize: '14px',
+  color: '#d5f4e6',
+  margin: 0,
+  fontWeight: '500',
+};
+
+const infoCard = {
+  backgroundColor: '#f8f9fa',
+  padding: '25px',
+  borderRadius: '8px',
+  margin: '20px 0',
+  border: '1px solid #e9ecef',
+};
+
+const infoColumn = {
+  width: '50%',
+  padding: '0 10px',
+};
+
+const infoLabel = {
   fontSize: '12px',
+  fontWeight: '600',
+  color: '#6c757d',
+  textTransform: 'uppercase' as const,
+  letterSpacing: '0.5px',
+  margin: '0 0 5px 0',
 };
 
-const informationTableRow = {
-  height: '46px',
+const infoValue = {
+  fontSize: '16px',
+  fontWeight: '500',
+  color: '#2c3e50',
+  margin: 0,
 };
 
-const informationTableColumn = {
-  paddingLeft: '20px',
-  borderStyle: 'solid',
-  borderColor: 'white',
-  borderWidth: '0px 1px 1px 0px',
-  height: '44px',
+const downloadButton = {
+  backgroundColor: '#e74c3c',
+  color: '#ffffff',
+  padding: '12px 24px',
+  borderRadius: '6px',
+  textDecoration: 'none',
+  fontSize: '14px',
+  fontWeight: '600',
+  display: 'inline-block',
+  boxShadow: '0 2px 4px rgba(231, 76, 60, 0.2)',
 };
 
-const informationTableLabel = {
-  ...resetText,
-  color: 'rgb(102,102,102)',
-  fontSize: '10px',
+const itemsSection = {
+  margin: '30px 0',
 };
 
-const informationTableValue = {
-  fontSize: '12px',
-  margin: '0',
+const sectionTitle = {
+  fontSize: '20px',
+  fontWeight: '600',
+  color: '#2c3e50',
+  margin: '0 0 20px 0',
+  borderBottom: '2px solid #e74c3c',
+  paddingBottom: '8px',
+};
+
+const tableHeader = {
+  backgroundColor: '#34495e',
   padding: '0',
-  lineHeight: 1.4,
+  borderRadius: '8px 8px 0 0',
 };
 
-const productTitleTable = {
-  ...informationTable,
-  margin: '30px 0 15px 0',
-  height: '24px',
+const tableHeaderText = {
+  fontSize: '14px',
+  fontWeight: '600',
+  color: '#ffffff',
+  margin: 0,
+  padding: '15px 10px',
 };
 
-const productsTitle = {
-  background: '#fafafa',
-  paddingLeft: '10px',
+const tableRow = {
+  borderBottom: '1px solid #e9ecef',
+};
+
+const itemName = {
+  fontSize: '15px',
+  fontWeight: '600',
+  color: '#2c3e50',
+  margin: '0 0 5px 0',
+  lineHeight: '1.4',
+};
+
+const itemVariant = {
+  fontSize: '12px',
+  color: '#6c757d',
+  margin: 0,
+  fontStyle: 'italic',
+};
+
+const itemQuantity = {
   fontSize: '14px',
   fontWeight: '500',
-  margin: '0',
+  color: '#2c3e50',
+  margin: 0,
 };
 
-const productIcon = {
-  margin: '0 0 0 20px',
-  borderRadius: '14px',
-  border: '1px solid rgba(128,128,128,0.2)',
+const itemPrice = {
+  fontSize: '15px',
+  fontWeight: '600',
+  color: '#27ae60',
+  margin: 0,
 };
 
-const productTitle = { fontSize: '12px', fontWeight: '600', ...resetText };
+const summarySection = {
+  backgroundColor: '#f8f9fa',
+  padding: '25px',
+  borderRadius: '8px',
+  margin: '20px 0',
+  border: '1px solid #e9ecef',
+};
 
-const productPriceTotal = {
-  margin: '0',
-  color: 'rgb(102,102,102)',
+const summaryRow = {
+  padding: '8px 0',
+};
+
+const summaryLabel = {
   fontSize: '14px',
+  color: '#6c757d',
+  margin: 0,
+  fontWeight: '500',
+};
+
+const summaryValue = {
+  fontSize: '14px',
+  color: '#2c3e50',
+  margin: 0,
   fontWeight: '600',
-  padding: '0px 30px 0px 0px',
-  textAlign: 'right' as const,
 };
 
-const NormalText = {
-  margin: '0',
+const summaryDivider = {
+  border: 'none',
+  borderTop: '2px solid #e74c3c',
+  margin: '15px 0',
 };
 
-const productPrice = {
-  fontSize: '12px',
-  fontWeight: '600',
-  margin: '0',
+const totalLabel = {
+  fontSize: '18px',
+  fontWeight: '700',
+  color: '#2c3e50',
+  margin: 0,
 };
 
-const productPriceLarge = {
-  margin: '0px 20px 0px 0px',
+const totalValue = {
+  fontSize: '20px',
+  fontWeight: '700',
+  color: '#e74c3c',
+  margin: 0,
+};
+
+const addressSection = {
+  margin: '30px 0',
+};
+
+const addressColumn = {
+  width: '50%',
+  padding: '0 15px',
+  verticalAlign: 'top' as const,
+};
+
+const addressTitle = {
   fontSize: '16px',
   fontWeight: '600',
-  whiteSpace: 'nowrap' as const,
-  textAlign: 'right' as const,
+  color: '#2c3e50',
+  margin: '0 0 10px 0',
 };
 
-const productPriceWrapper = {
-  display: 'table-cell',
-  padding: '0px 20px 0px 0px',
-  verticalAlign: 'top',
+const addressText = {
+  fontSize: '14px',
+  color: '#495057',
+  margin: '0 0 15px 0',
+  lineHeight: '1.5',
 };
 
-const productPriceLine = { margin: '30px 0 0 0' };
-
-const productPriceVerticalLine = {
-  height: '48px',
-  borderLeft: '1px solid',
-  borderColor: 'rgb(238,238,238)',
+const deliveryInfo = {
+  fontSize: '13px',
+  color: '#27ae60',
+  margin: 0,
+  fontWeight: '500',
+  padding: '10px',
+  backgroundColor: '#d5f4e6',
+  borderRadius: '4px',
+  lineHeight: '1.4',
 };
 
-const productPriceLargeWrapper = { display: 'table-cell', width: '90px' };
-
-const productPriceLineBottom = { margin: '0 0 75px 0' };
-
-const block = { display: 'block' };
-
-const footerCopyright = {
-  margin: '25px 0 0 0',
+const footer = {
   textAlign: 'center' as const,
+  padding: '30px 0',
+  borderTop: '2px solid #f0f0f0',
+  marginTop: '30px',
+};
+
+const footerText = {
+  fontSize: '14px',
+  color: '#6c757d',
+  margin: '0 0 15px 0',
+};
+
+const whatsappButton = {
+  backgroundColor: '#25d366',
+  color: '#ffffff',
+  padding: '10px 20px',
+  borderRadius: '25px',
+  textDecoration: 'none',
+  fontSize: '14px',
+  fontWeight: '600',
+  display: 'inline-flex',
+  alignItems: 'center',
+  boxShadow: '0 2px 4px rgba(37, 211, 102, 0.2)',
+};
+
+const copyright = {
   fontSize: '12px',
-  color: 'rgb(102,102,102)',
+  color: '#adb5bd',
+  margin: '20px 0 0 0',
 };

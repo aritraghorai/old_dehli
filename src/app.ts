@@ -6,7 +6,13 @@ import cors from 'cors';
 import globalErrorHandler from './controller/globarError.controller.js';
 import { myDataSource } from './utils/app-data-source.js';
 import env from './utils/env.js';
+import * as Sentry from '@sentry/node';
+
 import './lokiLogger.ts';
+
+Sentry.init({
+  dsn: 'https://88a0d455b0ac4e98b625cfb1f078c30f@glitchtip.dev.aritraghorai.in/1',
+});
 
 const app = express();
 
