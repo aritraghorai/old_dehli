@@ -144,7 +144,9 @@ function generateInvoiceTable(doc: PDFKit.PDFDocument, order: Order) {
     // .text(unitCost, 280, y, { width: 90, align: 'right' })
     .text('', 370, y, { width: 90, align: 'right' })
     .font('Helvetica')
-    .text(formatCurrency(order.grandTotal), 0, y, { align: 'right' });
+    .text(formatCurrency(order.grandTotal - order.deliveryCharge), 0, y, {
+      align: 'right',
+    });
 
   y = subtotalPosition + 15;
   doc
