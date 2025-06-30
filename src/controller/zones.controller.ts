@@ -53,10 +53,17 @@ const checkNotExistPinCodeAndAddThose = async (pinCodeList: string[]) => {
 
 const createNewZone = catchAsync(
   async (req: Request<any, any, NewZone>, res: Response) => {
-    const { name, pincodes = [], deliveryCharges, products = [] } = req.body;
+    const {
+      name,
+      pincodes = [],
+      deliveryCharges,
+      products = [],
+      minOrderValue = 0,
+    } = req.body;
     const newZone = Zone.create({
       name,
       deliveryCharges,
+      minOrderValue,
     });
     await newZone.save();
     newZone.pincodes = [];
@@ -88,7 +95,13 @@ const createNewZone = catchAsync(
 
 const updateZoneById = catchAsync(
   async (req: Request<{ id: string }, any, NewZone>, res: Response) => {
-    const { name, pincodes = [], deliveryCharges, products = [] } = req.body;
+    const {
+      name,
+      pincodes = [],
+      deliveryCharges,
+      products = [],
+      minOrderValue,
+    } = req.body;
     const updatedZone = await Zone.findOne({
       where: {
         id: req.params.id,
@@ -103,6 +116,9 @@ const updateZoneById = catchAsync(
     }
     updatedZone.name = name;
     updatedZone.deliveryCharges = deliveryCharges;
+    if (minOrderValue) {
+      updatedZone.minOrderValue = minOrderValue;
+    }
 
     for (const pincode of pincodes) {
       const pincodeEntity = await Pincode.findOne({

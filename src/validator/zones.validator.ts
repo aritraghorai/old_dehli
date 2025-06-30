@@ -6,7 +6,7 @@ export const NewZoneValidator = z.object({
     .number()
     .min(0)
     .transform(val => +val),
-  minDeliveryCharges: z.coerce
+  minOrderValue: z.coerce
     .number()
     .min(0)
     .transform(val => +val),

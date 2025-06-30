@@ -185,11 +185,11 @@ const checkDeliveryPossibleOrNot = catchAsync(
       });
       if (zone) {
         deliveryCharge = zone.deliveryCharges;
-        if (zone.minDeliveryCharges) {
-          if (zone.minDeliveryCharges > totalAmount) {
+        if (zone.minOrderValue) {
+          if (zone.minOrderValue > totalAmount) {
             return res.status(400).json({
               status: false,
-              message: `User need to order minimum of ${zone.minDeliveryCharges} to deliver to the pincode ${address.pincode.pincode}`,
+              message: `User need to order minimum of ${zone.minOrderValue} to deliver to the pincode ${address.pincode.pincode}`,
             });
           }
         }

@@ -89,7 +89,7 @@ export class Zone extends BaseEntity {
   deliveryCharges: number;
 
   @Column({ type: 'float', nullable: true })
-  minDeliveryCharges: number;
+  minOrderValue: number;
 
   @CreateDateColumn()
   createdAt: Date;
