@@ -30,6 +30,7 @@ import orderPdfService from '@/services/pdf/order.pdf.service.js';
 import plunkService from '@/services/email/plunk.service.js';
 import { render } from '@react-email/render';
 import Order_Email from 'emails/order/index.js';
+import { it } from 'node:test';
 
 declare module 'express' {
   interface Request {
@@ -106,6 +107,10 @@ const checkDeliveryPossibleOrNot = catchAsync(
         },
       });
 
+      const totalAmount = userCart.cardItems.reduce((acc, item) => {
+        return acc + item.count * item.productItem.price;
+      }, 0);
+
       const deliverPossibleItem = await userCardRepo.findOne({
         where: {
           user: { id: user.id },
@@ -180,6 +185,14 @@ const checkDeliveryPossibleOrNot = catchAsync(
       });
       if (zone) {
         deliveryCharge = zone.deliveryCharges;
+        if (zone.minDeliveryCharges) {
+          if (zone.minDeliveryCharges > totalAmount) {
+            return res.status(400).json({
+              status: false,
+              message: `User need to order minimum of ${zone.minDeliveryCharges} to deliver to the pincode ${address.pincode.pincode}`,
+            });
+          }
+        }
       } else {
         zone = await zoneRepo.findOne({
           where: {
