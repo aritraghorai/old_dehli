@@ -6,6 +6,10 @@ export const NewZoneValidator = z.object({
     .number()
     .min(0)
     .transform(val => +val),
+  minDeliveryCharges: z.coerce
+    .number()
+    .min(0)
+    .transform(val => +val),
   pincodes: z.array(z.string().uuid()).optional(),
   products: z.array(z.string().uuid()).optional(),
 });

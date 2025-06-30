@@ -12,6 +12,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Product } from './product.entity.js';
+import { tr } from '@faker-js/faker';
 
 @Entity()
 export class Pincode extends BaseEntity {
@@ -86,6 +87,9 @@ export class Zone extends BaseEntity {
 
   @Column({ type: 'float' })
   deliveryCharges: number;
+
+  @Column({ type: 'float', nullable: true })
+  minDeliveryCharges: number;
 
   @CreateDateColumn()
   createdAt: Date;
