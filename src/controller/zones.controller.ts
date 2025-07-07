@@ -232,6 +232,36 @@ const deleteZoneById = catchAsync(
     });
   },
 );
+const getZoneByPincode = catchAsync(
+  async (req: Request<{ pincode: string }, any, any>, res: Response) => {
+    const zone = await Zone.findOne({
+      where: [
+        {
+          pincodes: {
+            pincode: req.params.pincode,
+          },
+        },
+        {
+          name: 'All India',
+        },
+      ],
+    });
+    if (!zone) {
+      return res.status(200).json({
+        status: 'success',
+        data: {
+          name: 'All India',
+        },
+      });
+    }
+    zone.pincodes = undefined;
+
+    return res.status(200).json({
+      status: 'success',
+      data: zone,
+    });
+  },
+);
 
 export default {
   createNewZone,
@@ -239,4 +269,5 @@ export default {
   updateZoneById,
   uploadOrUpdateMultipleZones,
   deleteZoneById,
+  getZoneByPincode,
 };

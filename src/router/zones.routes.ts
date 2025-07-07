@@ -11,6 +11,7 @@ import { Router } from 'express';
 const zoneRouter = Router();
 
 zoneRouter.use(extractUser);
+zoneRouter.get('/pincode/:pincode', zonesController.getZoneByPincode);
 zoneRouter.use(restrictUser(ROLES.ADMIN, ROLES.SUPER_ADMIN));
 
 zoneRouter
