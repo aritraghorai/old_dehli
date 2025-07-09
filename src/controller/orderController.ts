@@ -40,6 +40,8 @@ declare module 'express' {
   }
 }
 
+export const allIndiaFilter = ILike('%All India%');
+
 const sendOrderStatusEmail = async (
   email: string[],
   order: Order,
@@ -125,7 +127,7 @@ const checkDeliveryPossibleOrNot = catchAsync(
                     },
                   },
                   {
-                    name: ILike('%All India%'),
+                    name: allIndiaFilter,
                   },
                 ],
               },
@@ -197,7 +199,7 @@ const checkDeliveryPossibleOrNot = catchAsync(
       } else {
         zone = await zoneRepo.findOne({
           where: {
-            name: 'All India',
+            name: allIndiaFilter,
           },
         });
         isAllIndia = true;

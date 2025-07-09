@@ -9,6 +9,7 @@ import pincodeController from './pincode.controller.js';
 import _ from 'lodash';
 import fs from 'fs/promises';
 import { In } from 'typeorm';
+import { allIndiaFilter } from './orderController.js';
 
 //Indian pincode regex
 let regex = new RegExp(/^[1-9]{1}[0-9]{2}\s{0,1}[0-9]{3}$/);
@@ -242,7 +243,7 @@ const getZoneByPincode = catchAsync(
           },
         },
         {
-          name: 'All India',
+          name: allIndiaFilter,
         },
       ],
     });
