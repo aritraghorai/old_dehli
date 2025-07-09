@@ -31,6 +31,7 @@ import plunkService from '@/services/email/plunk.service.js';
 import { render } from '@react-email/render';
 import Order_Email from 'emails/order/index.js';
 import { it } from 'node:test';
+import { Like } from 'typeorm';
 
 declare module 'express' {
   interface Request {
@@ -124,7 +125,7 @@ const checkDeliveryPossibleOrNot = catchAsync(
                     },
                   },
                   {
-                    name: 'All India',
+                    name: Like('All India'),
                   },
                 ],
               },
