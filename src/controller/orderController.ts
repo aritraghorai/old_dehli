@@ -125,7 +125,7 @@ const checkDeliveryPossibleOrNot = catchAsync(
                     },
                   },
                   {
-                    name: Like('All India'),
+                    name: Like('%All India%'),
                   },
                 ],
               },
