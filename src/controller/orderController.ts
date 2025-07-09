@@ -147,6 +147,8 @@ const checkDeliveryPossibleOrNot = catchAsync(
         },
       });
 
+      console.log(deliverPossibleItem);
+
       if (!userCart || !userCart.cardItems.length) {
         throw new AppError('No item in the cart', 400);
       }
