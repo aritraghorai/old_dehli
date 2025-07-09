@@ -40,7 +40,7 @@ declare module 'express' {
   }
 }
 
-export const allIndiaFilter = ILike('%All India%');
+export const allIndiaFilter = ILike('%all%');
 
 const sendOrderStatusEmail = async (
   email: string[],
