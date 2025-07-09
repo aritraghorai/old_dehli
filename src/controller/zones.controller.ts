@@ -103,8 +103,6 @@ const updateZoneById = catchAsync(
       products = [],
       minOrderValue,
     } = req.body;
-
-    // Single query to get the zone with relations
     const updatedZone = await Zone.findOne({
       where: {
         id: req.params.id,
@@ -114,193 +112,53 @@ const updateZoneById = catchAsync(
         products: true,
       },
     });
-
     if (!updatedZone) {
       throw new AppError('Zone not found', 404);
     }
-
-    // Update basic fields
     updatedZone.name = name;
     updatedZone.deliveryCharges = deliveryCharges;
     if (minOrderValue) {
       updatedZone.minOrderValue = minOrderValue;
     }
 
-    // Batch query for all pincodes if any are provided
-    let pincodeEntities = [];
-    if (pincodes.length > 0) {
-      pincodeEntities = await Pincode.findBy({
-        id: In(pincodes),
+    for (const pincode of pincodes) {
+      const pincodeEntity = await Pincode.findOne({
+        where: {
+          id: pincode,
+        },
       });
-
-      // Check if all pincodes exist
-      if (pincodeEntities.length !== pincodes.length) {
-        const foundPincodeIds = pincodeEntities.map(p => p.id);
-        const missingPincodes = pincodes.filter(
-          id => !foundPincodeIds.includes(id),
-        );
+      if (!pincodeEntity)
         return res.status(404).json({
           status: 'error',
-          message: `Pincode(s) not found: ${missingPincodes.join(', ')}`,
+          message: 'Pincode not found',
         });
-      }
-
-      // Replace the zone's pincodes with the new ones
-      updatedZone.pincodes = pincodeEntities;
-    } else {
-      // If no pincodes provided, clear the existing ones
-      updatedZone.pincodes = [];
+      if (!updatedZone.pincodes.includes(pincodeEntity))
+        updatedZone.pincodes.push(pincodeEntity);
     }
-
-    // Batch query for all products if any are provided
-    let productEntities = [];
-    if (products.length > 0) {
-      productEntities = await Product.findBy({
-        id: In(products),
+    updatedZone.pincodes = updatedZone.pincodes.filter(pincode =>
+      pincodes.some(id => id === pincode.id),
+    );
+    for (const shop of products) {
+      const productEntity = await Product.findOne({
+        where: {
+          id: shop,
+        },
       });
-
-      // Check if all products exist
-      if (productEntities.length !== products.length) {
-        const foundProductIds = productEntities.map(p => p.id);
-        const missingProducts = products.filter(
-          id => !foundProductIds.includes(id),
-        );
-        throw new AppError(
-          `Product(s) not found: ${missingProducts.join(', ')}`,
-          404,
-        );
-      }
-
-      // Replace the zone's products with the new ones
-      updatedZone.products = productEntities;
-    } else {
-      // If no products provided, clear the existing ones
-      updatedZone.products = [];
+      if (!productEntity) throw new AppError('Product not found', 404);
+      if (!updatedZone.products.includes(productEntity))
+        updatedZone.products.push(productEntity);
     }
-
-    // Get repository and update
-    const zoneRepository = Zone.getRepository();
-
-    // Save basic fields
-    await zoneRepository.save({
-      id: updatedZone.id,
-      name: updatedZone.name,
-      deliveryCharges: updatedZone.deliveryCharges,
-      minOrderValue: updatedZone.minOrderValue,
-    });
-
-    // Update pincodes relationship
-    await zoneRepository
-      .createQueryBuilder()
-      .relation(Zone, 'pincodes')
-      .of(updatedZone.id)
-      .remove(updatedZone.pincodes.map(p => p.id));
-
-    if (pincodeEntities.length > 0) {
-      await zoneRepository
-        .createQueryBuilder()
-        .relation(Zone, 'pincodes')
-        .of(updatedZone.id)
-        .add(pincodeEntities.map(p => p.id));
-    }
-
-    // Update products relationship
-    await zoneRepository
-      .createQueryBuilder()
-      .relation(Zone, 'products')
-      .of(updatedZone.id)
-      .remove(updatedZone.products.map(p => p.id));
-
-    if (productEntities.length > 0) {
-      await zoneRepository
-        .createQueryBuilder()
-        .relation(Zone, 'products')
-        .of(updatedZone.id)
-        .add(productEntities.map(p => p.id));
-    }
-
-    // Fetch updated entity with relations
-    const finalZone = await Zone.findOne({
-      where: { id: updatedZone.id },
-      relations: {
-        pincodes: true,
-        products: true,
-      },
-    });
-
+    updatedZone.products = updatedZone.products.filter(shop =>
+      products.some(id => id === shop.id),
+    );
+    await updatedZone.save();
     return res.status(200).json({
       status: 'success',
       message: 'Zone updated successfully',
-      data: finalZone,
+      data: updatedZone,
     });
   },
 );
-
-// const updateZoneById = catchAsync(
-//   async (req: Request<{ id: string }, any, NewZone>, res: Response) => {
-//     const {
-//       name,
-//       pincodes = [],
-//       deliveryCharges,
-//       products = [],
-//       minOrderValue,
-//     } = req.body;
-//     const updatedZone = await Zone.findOne({
-//       where: {
-//         id: req.params.id,
-//       },
-//       relations: {
-//         pincodes: true,
-//         products: true,
-//       },
-//     });
-//     if (!updatedZone) {
-//       throw new AppError('Zone not found', 404);
-//     }
-//     updatedZone.name = name;
-//     updatedZone.deliveryCharges = deliveryCharges;
-//     if (minOrderValue) {
-//       updatedZone.minOrderValue = minOrderValue;
-//     }
-//
-//     for (const pincode of pincodes) {
-//       const pincodeEntity = await Pincode.findOne({
-//         where: {
-//           id: pincode,
-//         },
-//       });
-//       if (!pincodeEntity)
-//         return res.status(404).json({
-//           status: 'error',
-//           message: 'Pincode not found',
-//         });
-//       if (!updatedZone.pincodes.includes(pincodeEntity))
-//         updatedZone.pincodes.push(pincodeEntity);
-//     }
-//     updatedZone.pincodes = updatedZone.pincodes.filter(pincode =>
-//       pincodes.some(id => id === pincode.id),
-//     );
-//     for (const shop of products) {
-//       const productEntity = await Product.findOne({
-//         where: {
-//           id: shop,
-//         },
-//       });
-//       if (!productEntity) throw new AppError('Product not found', 404);
-//       if (!updatedZone.products.includes(productEntity))
-//         updatedZone.products.push(productEntity);
-//     }
-//     updatedZone.products = updatedZone.products.filter(shop =>
-//       products.some(id => id === shop.id),
-//     );
-//     await updatedZone.save();
-//     return res.status(200).json({
-//       status: 'success',
-//       message: 'Zone updated successfully',
-//       data: updatedZone,
-//     });
-//   },
-// );
 
 const getAllZones = catchAsync(async (req: Request, res: Response) => {
   const zones = await Zone.find({
