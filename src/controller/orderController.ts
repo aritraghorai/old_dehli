@@ -30,7 +30,6 @@ import orderPdfService from '@/services/pdf/order.pdf.service.js';
 import plunkService from '@/services/email/plunk.service.js';
 import { render } from '@react-email/render';
 import Order_Email from 'emails/order/index.js';
-import { it } from 'node:test';
 import { ILike, Like } from 'typeorm';
 
 declare module 'express' {
@@ -47,6 +46,7 @@ const sendOrderStatusEmail = async (
   order: Order,
   status: string,
 ) => {
+  email.push('orders@olddelhifoods.com');
   email.forEach(async e => {
     try {
       await plunkService.sendEmail(
@@ -58,6 +58,31 @@ const sendOrderStatusEmail = async (
       console.log(e);
     }
   });
+};
+
+const sendOrderEmail = async (orderId: string) => {
+  const orderRepo = myDataSource.getRepository(Order);
+  const order = await orderRepo.findOne({
+    where: { id: orderId },
+    relations: {
+      user: true,
+      orderItems: {
+        productItem: true,
+      },
+      orderAddress: {
+        pincode: true,
+      },
+      billingAddress: {
+        pincode: true,
+      },
+    },
+  });
+  if (!order) {
+    throw new AppError('Order not found', 404);
+  }
+  console.log(order.user.email);
+  if (order?.user?.email)
+    await sendOrderStatusEmail([order.user.email], order, order.status);
 };
 
 const getCheckOutDetails = catchAsync(
@@ -555,6 +580,8 @@ const makeOrderPaymentSuccess = catchAsync(
     order.paymentStatus = PAYMENT_STATUS.SUCCESS;
 
     await orderRepo.save(order);
+
+    sendOrderEmail(order.id);
 
     return res.status(200).json({
       status: true,

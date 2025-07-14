@@ -42,7 +42,7 @@ export const Order_Email = ({ order, status }: Order_EmailProps) => (
                 src={`${baseUrl}/static/images/old_dehli.png`}
                 width="80"
                 height="80"
-                alt="Old Delhi Store"
+                alt="Old Delhi Foods"
                 style={logo}
               />
               <Text style={storeName}>Old Delhi Store</Text>
