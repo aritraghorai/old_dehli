@@ -5,7 +5,6 @@ const sendEmail = async (email: string, subject: string, body: string) => {
   await axios.post(
     'https://api.useplunk.com/v1/send',
     {
-      from: 'Info@olddelhifoods.com',
       name: 'Old Delhi Foods',
       subject: subject,
       body: body,

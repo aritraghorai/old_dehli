@@ -25,6 +25,15 @@ interface Order_EmailProps {
   status: string;
 }
 
+// Helper function to convert 24-hour time to 12-hour format
+const formatTime12Hour = (time24: string): string => {
+  const [hours, minutes] = time24.split(':');
+  const hour = parseInt(hours, 10);
+  const period = hour >= 12 ? 'PM' : 'AM';
+  const hour12 = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+  return `${hour12}:${minutes} ${period}`;
+};
+
 export const Order_Email = ({ order, status }: Order_EmailProps) => (
   <Html>
     <Head>
@@ -202,6 +211,8 @@ export const Order_Email = ({ order, status }: Order_EmailProps) => (
                 <br />
                 {order.billingAddress.state} -{' '}
                 {order.billingAddress.pincode.pincode}
+                <br />
+                📱 {order.orderAddress.mobile}
               </Text>
             </Column>
 
@@ -218,20 +229,36 @@ export const Order_Email = ({ order, status }: Order_EmailProps) => (
                 <br />
                 {order.orderAddress.state} -{' '}
                 {order.orderAddress.pincode.pincode}
+                <br />
+                📱 {order.orderAddress.mobile}
               </Text>
-              {order.orderAddress.deliveryDate && (
-                <Text style={deliveryInfo}>
-                  📅 Delivery:{' '}
-                  {new Date(
-                    order.orderAddress.deliveryDate,
-                  ).toLocaleDateString()}
-                  <br />
-                  🕐 Time: {order.orderAddress.startTime.toString()} -{' '}
-                  {order.orderAddress.endTime.toString()}
-                </Text>
-              )}
             </Column>
           </Row>
+
+          {/* Delivery Date and Time - Left aligned */}
+          {order.orderAddress.deliveryDate && (
+            <Row style={{ marginTop: '20px' }}>
+              <Column style={{ width: '100%' }}>
+                <Text style={deliveryInfo}>
+                  📅 Delivery Date:{' '}
+                  {new Date(order.orderAddress.deliveryDate).toLocaleDateString(
+                    'en-US',
+                    {
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    },
+                  )}
+                  <br />
+                  🕐 Delivery Time:{' '}
+                  {formatTime12Hour(
+                    order.orderAddress.startTime.toString(),
+                  )} - {formatTime12Hour(order.orderAddress.endTime.toString())}
+                </Text>
+              </Column>
+            </Row>
+          )}
         </Section>
 
         {/* Footer */}
@@ -495,14 +522,15 @@ const addressText = {
 };
 
 const deliveryInfo = {
-  fontSize: '13px',
+  fontSize: '14px',
   color: '#27ae60',
   margin: 0,
   fontWeight: '500',
-  padding: '10px',
+  padding: '15px',
   backgroundColor: '#d5f4e6',
-  borderRadius: '4px',
-  lineHeight: '1.4',
+  borderRadius: '8px',
+  lineHeight: '1.5',
+  textAlign: 'left' as const,
 };
 
 const footer = {
