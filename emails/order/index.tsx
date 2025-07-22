@@ -278,7 +278,7 @@ export const Order_Email = ({ order, status }: Order_EmailProps) => (
           </Link>
 
           <Text style={copyright}>
-            © 2024 Old Delhi Store. All rights reserved.
+            © 2025 Old Delhi Store. All rights reserved.
           </Text>
         </Section>
       </Container>
