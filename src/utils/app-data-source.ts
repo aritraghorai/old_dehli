@@ -13,6 +13,6 @@ export const myDataSource = new DataSource({
   migrationsTableName: 'migrations',
   migrations: [`${filePath}/orm/migrations/*.${fileType}`],
   entities: [`${filePath}/entities/**/*.${fileType}`],
-  logging: true,
+  logging: false,
   synchronize: false,
 });
