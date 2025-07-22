@@ -27,6 +27,7 @@ interface Order_EmailProps {
 
 // Helper function to convert 24-hour time to 12-hour format
 const formatTime12Hour = (time24: string): string => {
+  console.log('Time24 ' + time24);
   const [hours, minutes] = time24.split(':');
   let hour = parseInt(hours, 10);
   hour = typeof hour === 'number' ? hour : 0; // Ensure hour is a number
