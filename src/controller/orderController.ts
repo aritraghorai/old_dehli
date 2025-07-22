@@ -391,7 +391,7 @@ const createOrder = catchAsync(
         // send sms
         // send email
         // send notification
-        await sendOrderStatusEmail([user.email], newOrder, 'Placed');
+        await sendOrderEmail(newOrder.orderId);
         return res.status(201).json({
           status: true,
           message: 'Order created successfully',
