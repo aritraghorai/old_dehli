@@ -83,7 +83,11 @@ const sendOrderEmail = async (orderId: string) => {
   }
   console.log(order.user.email);
   if (order?.user?.email)
-    await sendOrderStatusEmail([order.user.email], order, order.status);
+    await sendOrderStatusEmail(
+      [order.user.email],
+      order,
+      order.status.toUpperCase() === 'pending' ? 'Placed' : order.status,
+    );
 };
 
 const getCheckOutDetails = catchAsync(
