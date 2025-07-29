@@ -30,13 +30,21 @@ interface Order_EmailProps {
 const formatTime12Hour = (time24: string): string => {
   const date = dayjs(time24);
   console.log('Time24 ' + time24);
-  // const [hours, minutes] = time24.split(':');
-  const [hour, minutes] = [date.hour(), date.minute()];
+  let hourActual = 0;
+  let miniteActual = 0;
+  if (date.isValid()) {
+    hourActual = date.hour();
+    miniteActual = date.minute();
+  } else {
+    [hourActual, miniteActual] = time24.split(':').map(ele => parseInt(ele));
+  }
+
   // let hour = parseInt(hours, 10);
   // hour = typeof hour === 'number' ? hour : 0; // Ensure hour is a number
-  const period = hour >= 12 ? 'PM' : 'AM';
-  const hour12 = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
-  return `${hour12}:${minutes} ${period}`;
+  const period = hourActual >= 12 ? 'PM' : 'AM';
+  const hour12 =
+    hourActual === 0 ? 12 : hourActual > 12 ? hourActual - 12 : hourActual;
+  return `${hour12}:${miniteActual} ${period}`;
 };
 
 export const Order_Email = ({ order, status }: Order_EmailProps) => (
