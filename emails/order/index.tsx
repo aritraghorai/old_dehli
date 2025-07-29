@@ -13,6 +13,7 @@ import {
 } from '@react-email/components';
 import * as React from 'react';
 import { Button } from '@react-email/components';
+import dayjs from 'dayjs';
 
 import { Order } from '../../src/entities/order.entity.js';
 import { order } from './data.js';
@@ -27,10 +28,12 @@ interface Order_EmailProps {
 
 // Helper function to convert 24-hour time to 12-hour format
 const formatTime12Hour = (time24: string): string => {
+  const date = dayjs(time24);
   console.log('Time24 ' + time24);
-  const [hours, minutes] = time24.split(':');
-  let hour = parseInt(hours, 10);
-  hour = typeof hour === 'number' ? hour : 0; // Ensure hour is a number
+  // const [hours, minutes] = time24.split(':');
+  const [hour, minutes] = [date.hour(), date.minute()];
+  // let hour = parseInt(hours, 10);
+  // hour = typeof hour === 'number' ? hour : 0; // Ensure hour is a number
   const period = hour >= 12 ? 'PM' : 'AM';
   const hour12 = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
   return `${hour12}:${minutes} ${period}`;
