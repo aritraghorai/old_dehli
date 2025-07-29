@@ -31,6 +31,7 @@ import plunkService from '@/services/email/plunk.service.js';
 import { render } from '@react-email/render';
 import Order_Email from 'emails/order/index.js';
 import { ILike, Like } from 'typeorm';
+import { order } from 'emails/order/data.js';
 
 declare module 'express' {
   interface Request {
@@ -395,7 +396,12 @@ const createOrder = catchAsync(
         // send sms
         // send email
         // send notification
-        await sendOrderEmail(newOrder.orderId);
+        // await sendOrderEmail(newOrder.orderId);
+        await sendOrderStatusEmail(
+          [newOrder.user.email],
+          newOrder,
+          ORDER_STATUS_ENUM.PENDING,
+        );
         return res.status(201).json({
           status: true,
           message: 'Order created successfully',
