@@ -239,7 +239,8 @@ const checkDeliveryPossibleOrNot = catchAsync(
         //calculate delivery charge by weight
         for (const item of userCart.cardItems) {
           deliveryCharge +=
-            item.productItem.weight * zone.deliveryCharges ?? 10 * item.count;
+            item.productItem.weight * zone.deliveryCharges * item.count ??
+            10 * item.count;
         }
       }
 
