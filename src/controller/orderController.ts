@@ -48,7 +48,6 @@ const sendOrderStatusEmail = async (
   status: string,
 ) => {
   email.push('orders@olddelhifoods.com');
-  email.push('aritra1521@gmail.com');
   email.forEach(async e => {
     try {
       await plunkService.sendEmail(
